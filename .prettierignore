@@ -1,0 +1,5 @@
+node_modules
+*.py
+*.sqlite3
+*.db
+

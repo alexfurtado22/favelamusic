@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load static %}
+{% block body %}
+    <h1>Delete Artist</h1>
+    <p>Are you sure you want to delete the artist "{{ object.name }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="text-red-600 hover:text-red-800 cursor-pointer">Delete</button>
+        <a href="{% url 'home' %}" class="ml-4 underline">Cancel</a>
+    </form>
+{% endblock body %}

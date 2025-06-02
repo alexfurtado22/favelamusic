@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+{% block body %}
+    <h1>Edit Artist</h1>
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="id_name">Name:</label>
+        <input type="text" name="name" id="id_name" required>
+        <br>
+        <br>
+        <label for="id_picture">Picture:</label>
+        <input type="file" name="picture" id="id_picture">
+        <br>
+        <br>
+        <label for="id_track">Track:</label>
+        <input type="file" name="track" id="id_track">
+        <br>
+        <br>
+        <label for="id_video">Video:</label>
+        <input type="file" name="video" id="id_video">
+        <br>
+        <br>
+        <label for="id_genre">Genre:</label>
+        <input type="text" name="genre" id="id_genre">
+        <br>
+        <br>
+        <label for="id_content">Content:</label>
+        <textarea name="content" id="id_content" rows="4"></textarea>
+        <br>
+        <br>
+        <label for="id_producer">Producer:</label>
+        <input type="text" name="producer" id="id_producer">
+        <br>
+        <br>
+        <label for="id_twitter">Twitter:</label>
+        <input type="url" name="twitter" id="id_twitter">
+        <br>
+        <br>
+        <label for="id_instagram">Instagram:</label>
+        <input type="url" name="instagram" id="id_instagram">
+        <br>
+        <br>
+        <button type="submit">Update Artist</button>
+    </form>
+    <br>
+    <a href="{% url 'home' %}">Back to Home</a>
+{% endblock body %}

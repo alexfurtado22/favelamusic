@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "prettier-plugin-tailwindcss": "^0.6.11"
+  },
+  "scripts": {
+    "format:css": "prettier --write 'theme/static_src/src/**/*.{css,js,ts,jsx,tsx}'",
+    "format": "npm run format:css"
+  }
+}

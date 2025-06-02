@@ -1,0 +1,357 @@
+/*
+* This is where you can configure the folders that Tailwind will scan.
+* 
+* For detailed documents, check the Tailwind docs at:
+*
+* https://tailwindcss.com/docs/detecting-classes-in-source-files#explicitly-registering-sources
+*
+* This default configuration will scan all folder in your root project directory.
+*
+* Here is an example configuration that will only scan your templates/ folder:
+* 
+* @import "tailwindcss" source(none);
+*
+* @source "../../../templates";
+*/
+
+@import "tailwindcss";
+@source "../../../**/*.{html,py,js}";
+
+/*
+* If you would like to customise you theme, you can do that here too.
+*
+* https://tailwindcss.com/docs/theme
+*
+*/
+
+@theme {
+  /* Default colors (light mode fallback) */
+  --color-text-1: oklch(27.8% 0.033 256.848);
+  --color-text-2: oklch(37.3% 0.034 259.733);
+  --color-surface-1: oklch(98.5% 0.002 247.839);
+  --color-surface-2: oklch(96.7% 0.003 264.542);
+  --color-surface-3: oklch(92.8% 0.006 264.531);
+  --color-surface-4: oklch(87.2% 0.01 258.338);
+  --color-surface-shadow: oklch(27.8% 0.033 256.848);
+  --color-shadow-strength: 0.02;
+  --color-brand: oklch(64.6% 0.222 41.116);
+  --color-clr-neon-pink: oklch(69.55% 0.31 331.65);
+}
+
+/* Dark mode fallback for auto */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --color-text-1: oklch(87.2% 0.01 258.338);
+    --color-text-2: oklch(55.1% 0.027 264.364);
+    --color-surface-1: oklch(13% 0.028 261.692);
+    --color-surface-2: oklch(21% 0.034 264.665);
+    --color-surface-3: oklch(27.8% 0.033 256.848);
+    --color-surface-4: oklch(37.3% 0.034 259.733);
+    --color-surface-shadow: oklch(13% 0.028 261.692);
+    --color-shadow-strength: 0.8;
+    --color-brand: oklch(83.7% 0.128 66.29);
+  }
+}
+
+/* Themes */
+[data-theme="light"] {
+  --color-text-1: oklch(27.8% 0.033 256.848);
+  --color-text-2: oklch(37.3% 0.034 259.733);
+  --color-surface-1: oklch(98.5% 0.002 247.839);
+  --color-surface-2: oklch(96.7% 0.003 264.542);
+  --color-surface-3: oklch(92.8% 0.006 264.531);
+  --color-surface-4: oklch(87.2% 0.01 258.338);
+  --color-surface-shadow: oklch(27.8% 0.033 256.848);
+  --color-shadow-strength: 0.02;
+  --color-brand: oklch(64.6% 0.222 41.116);
+}
+
+[data-theme="dark"] {
+  --color-text-1: oklch(87.2% 0.01 258.338);
+  --color-text-2: oklch(55.1% 0.027 264.364);
+  --color-surface-1: oklch(13% 0.028 261.692);
+  --color-surface-2: oklch(21% 0.034 264.665);
+  --color-surface-3: oklch(27.8% 0.033 256.848);
+  --color-surface-4: oklch(37.3% 0.034 259.733);
+  --color-surface-shadow: oklch(13% 0.028 261.692);
+  --color-shadow-strength: 0.8;
+  --color-brand: oklch(83.7% 0.128 66.29);
+}
+
+[data-theme="lime"] {
+  --color-text-1: oklch(96% 0.2 147);
+  --color-text-2: oklch(90% 0.2 147);
+  --color-surface-1: oklch(16% 0.06 147);
+  --color-surface-2: oklch(20% 0.08 147);
+  --color-surface-3: oklch(25% 0.1 147);
+  --color-surface-4: oklch(39.5% 0.16 147);
+  --color-surface-shadow: oklch(16% 0.06 147);
+  --color-shadow-strength: 0.8;
+  --color-brand: oklch(88% 0.24 147);
+}
+[data-theme="blue"] {
+  --color-text-1: oklch(42% 0.15 250);
+  --color-text-2: oklch(51% 0.15 250);
+  --color-surface-1: oklch(95% 0.02 250);
+  --color-surface-2: oklch(87% 0.06 250);
+  --color-surface-3: oklch(80% 0.1 250);
+  --color-surface-4: oklch(76% 0.13 250);
+  --color-surface-shadow: oklch(17% 0.03 250);
+  --color-shadow-strength: 0.2;
+  --color-brand: oklch(62% 0.22 250);
+}
+
+[data-theme="dim"] {
+  --color-text-1: oklch(87.2% 0.01 258.338);
+  --color-text-2: oklch(70.7% 0.022 261.325);
+  --color-surface-1: oklch(34.51% 0.0133 248.21);
+  --color-surface-2: oklch(42.76% 0.0147 248.17);
+  --color-surface-3: oklch(64.28% 0.0152 248.06);
+  --color-surface-4: oklch(76.92% 0.0145 248.02);
+  --color-surface-shadow: oklch(26.21% 0.0095 248.19);
+  --color-shadow-strength: 0.2;
+  --color-brand: oklch(75% 0.183 55.934);
+}
+
+[data-theme="grape"] {
+  --color-text-1: oklch(38.1% 0.176 304.987);
+  --color-text-2: oklch(49.6% 0.265 301.924);
+  --color-surface-1: oklch(97.7% 0.014 308.299);
+  --color-surface-2: oklch(94.6% 0.033 307.174);
+  --color-surface-3: oklch(90.2% 0.063 306.703);
+  --color-surface-4: oklch(82.7% 0.119 306.383);
+  --color-surface-shadow: oklch(29.1% 0.149 302.717);
+  --color-shadow-strength: 0.02;
+  --color-brand: oklch(62.7% 0.265 303.9);
+}
+
+[data-theme="choco"] {
+  --color-text-1: oklch(92.27% 0.0568 75.63);
+  --color-text-2: oklch(86.77% 0.077 65.88);
+  --color-surface-1: oklch(28.05% 0.0533 54.07);
+  --color-surface-2: oklch(35.07% 0.0715 53.66);
+  --color-surface-3: oklch(41.02% 0.0913 52.35);
+  --color-surface-4: oklch(46.93% 0.1111 51.22);
+  --color-surface-shadow: oklch(28.05% 0.0533 54.07);
+  --color-shadow-strength: 0.2;
+  --color-brand: oklch(70.12% 0.1357 53.79);
+}
+
+html {
+  block-size: 100%;
+}
+
+/* Use the variables */
+body {
+  min-block-size: 100%;
+  background-color: var(--color-surface-1);
+  color: var(--color-text-1);
+  accent-color: var(--color-brand);
+  font-family: system-ui, sans-serif;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+@theme {
+  --text-fluid-00: clamp(0.5rem, 2vw, 1rem);
+  --text-fluid-0: clamp(0.75rem, 2vw, 1rem);
+  --text-fluid-base: clamp(1.125rem, 3vw, 1.5rem);
+  --text-fluid-1: clamp(1rem, 4vw, 1.5rem);
+  --text-fluid-2: clamp(1.5rem, 6vw, 2.5rem);
+  --text-fluid-3: clamp(2rem, 9vw, 3.5rem);
+  --text-fluid-4: clamp(2rem, 4vw, 3rem);
+  --text-fluid-5: clamp(4rem, 5vw, 5rem);
+  --text-fluid-6: clamp(5rem, 7vw, 7.5rem);
+  --text-fluid-7: clamp(7.5rem, 10vw, 10rem);
+  --text-fluid-8: clamp(10rem, 20vw, 15rem);
+  --text-fluid-9: clamp(15rem, 30vw, 20rem);
+  --text-fluid-10: clamp(20rem, 40vw, 30rem);
+}
+
+@theme {
+  --aspect-square: 1;
+  --aspect-landscape: 4/3;
+  --aspect-portrait: 3/4;
+  --aspect-widescreen: 16/9;
+  --aspect-ultrawide: 18/5;
+  --aspect-golden: 1.618/1;
+}
+
+* {
+  line-height: calc(1em + 0.5rem);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+/* Balance text wrapping on headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+p,
+li,
+figcaption {
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+
+header,
+main,
+aside,
+section,
+article,
+footer {
+  container-type: inline-size;
+}
+
+li {
+  text-decoration: none;
+}
+
+/* Scrollbar */
+body::-webkit-scrollbar {
+  width: 8px;
+}
+
+body::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 0 oklch(0 0 0);
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: var(--color-brand);
+  outline: 1px solid var(--color-brand);
+}
+
+.section {
+  margin-top: 5rem;
+}
+
+.holder {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border: 1px red solid;
+}
+
+.btn {
+  display: inline-block;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: -0.05em;
+  background-color: var(--color-clr-neon-pink);
+  color: oklch(96.83% 0.007 247.9);
+  padding: 0.5em 1em;
+  border-radius: 6px;
+  box-shadow:
+    0 10px 20px oklch(69.55% 0.31 331.65 / 50%),
+    0 6px 6px oklch(69.55% 0.31 331.65 / 50%),
+    0 0 100px -10px var(--color-clr-neon-pink);
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 14px 28px oklch(69.55% 0.31 331.65 / 25%),
+    0 10px 10px oklch(69.55% 0.31 331.65 / 22%),
+    0 0 120px -10px var(--color-clr-neon-pink);
+}
+
+@theme {
+  --breakpoint-xxs: 15rem; /* 240px */
+  --breakpoint-xs: 24rem; /* 384px */
+  --breakpoint-sm: 32rem; /* 512px */
+  --breakpoint-md: 42rem; /* 672px */
+  --breakpoint-lg: 48rem; /* 768px */
+  --breakpoint-xl: 64rem; /* 1024px */
+  --breakpoint-xxl: 90rem; /* 1440px */
+  --breakpoint-xxxl: 120rem; /* 1920px */
+}
+/* xxs */
+@media (min-width: 15rem) {
+  .holder {
+    max-width: 15rem;
+  }
+}
+/* xs */
+@media (min-width: 24rem) {
+  .holder {
+    max-width: 24rem;
+  }
+}
+/* sm */
+@media (min-width: 32rem) {
+  .holder {
+    max-width: 32rem;
+  }
+}
+
+/* md */
+@media (min-width: 42rem) {
+  .holder {
+    max-width: 42rem;
+  }
+
+  /* lg   */
+}
+@media (min-width: 48rem) {
+  .holder {
+    max-width: 48rem;
+  }
+}
+
+/* xlg */
+@media (min-width: 64rem) {
+  .holder {
+    max-width: 64rem;
+  }
+}
+
+/* xxl */
+@media (min-width: 90rem) {
+  .holder {
+    max-width: 90rem;
+  }
+}
+
+/* xxxl */
+@media (min-width: 120rem) {
+  .holder {
+    max-width: 120rem;
+  }
+}
+
+.holder {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border: 1px red solid;
+}
+
+/*
+* You can install tailwind plugins like below.
+*
+* https://tailwindcss.com/docs/functions-and-directives#plugin-directive
+*
+*/
+
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/aspect-ratio";

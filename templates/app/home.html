@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+{% block body %}
+    <div class="text-center my-12">
+        <h1 class="texxt text-fluid-4 font-extrabold tracking-tight mb-4">Welcome to FavelaMusic</h1>
+        <p class="text-lg">Explore your favorite music themes with dynamic color schemes.</p>
+    </div>
+    <div class="max-w-5xl mx-auto px-4 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {% for artist in artists %}
+            <div class=" rounded-2xl shadow-lg p-6 border ">
+                <h2 class="text-xl font-semibold mb-2">{{ artist.name }}</h2>
+                {% if artist.picture %}
+                    <img src="{{ artist.picture.url }}"
+                         alt="{{ artist.name }}"
+                         width="100%"
+                         height="192"
+                         class="w-full h-48 object-cover rounded-lg mb-4 border border-gray-300 dark:border-gray-600">
+                {% endif %}
+                <p class="text-sm mb-2">
+                    <strong>Genre:</strong> {{ artist.genre }}
+                </p>
+                {% if artist.track %}
+                    <div class="mb-4">
+                        <audio controls class="w-full">
+                            <source src="{{ artist.track.url }}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                {% endif %}
+                {% if artist.video %}
+                    <div class="mb-4">
+                        <video controls class="w-full rounded-lg">
+                            <source src="{{ artist.video.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                {% endif %}
+                {% if artist.content %}<p class="mb-3">{{ artist.content }}</p>{% endif %}
+                <div class="flex gap-4">
+                    {% if artist.twitter %}
+                        <a href="{{ artist.twitter }}"
+                           target="_blank"
+                           class="text-blue-500 hover:underline font-medium">Twitter</a>
+                    {% endif %}
+                    {% if artist.instagram %}
+                        <a href="{{ artist.instagram }}"
+                           target="_blank"
+                           class="text-pink-500 hover:underline font-medium">Instagram</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center col-span-full">No artists found.</p>
+        {% endfor %}
+    </div>
+{% endblock body %}
