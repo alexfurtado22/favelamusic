@@ -4,11 +4,15 @@
     <div class="text-center my-12">
         <h1 class="texxt text-fluid-4 font-extrabold tracking-tight mb-4">Welcome to FavelaMusic</h1>
         <p class="text-lg">Explore your favorite music themes with dynamic color schemes.</p>
+        <a href="{% url 'create_artist' %}"
+           class="ml-4 underline text-surface-shadow hover:text-surface-shadow/70 cursor-pointer">Create Artist</a>
     </div>
     <div class="max-w-5xl mx-auto px-4 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {% for artist in artists %}
             <div class=" rounded-2xl shadow-lg p-6 border ">
-                <h2 class="text-xl font-semibold mb-2">{{ artist.name }}</h2>
+                <h2 class="text-xl font-semibold mb-2">
+                    <a href="{% url 'update_artist' artist.pk %}">{{ artist.name }}</a>
+                </h2>
                 {% if artist.picture %}
                     <img src="{{ artist.picture.url }}"
                          alt="{{ artist.name }}"

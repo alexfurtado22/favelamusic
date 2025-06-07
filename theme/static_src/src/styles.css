@@ -47,7 +47,7 @@
     --color-surface-2: oklch(21% 0.034 264.665);
     --color-surface-3: oklch(27.8% 0.033 256.848);
     --color-surface-4: oklch(37.3% 0.034 259.733);
-    --color-surface-shadow: oklch(13% 0.028 261.692);
+    --color-surface-shadow: oklch(45% 0.034 259.733);
     --color-shadow-strength: 0.8;
     --color-brand: oklch(83.7% 0.128 66.29);
   }
@@ -73,7 +73,7 @@
   --color-surface-2: oklch(21% 0.034 264.665);
   --color-surface-3: oklch(27.8% 0.033 256.848);
   --color-surface-4: oklch(37.3% 0.034 259.733);
-  --color-surface-shadow: oklch(13% 0.028 261.692);
+  --color-surface-shadow: oklch(45% 0.034 259.733);
   --color-shadow-strength: 0.8;
   --color-brand: oklch(83.7% 0.128 66.29);
 }
@@ -85,7 +85,7 @@
   --color-surface-2: oklch(20% 0.08 147);
   --color-surface-3: oklch(25% 0.1 147);
   --color-surface-4: oklch(39.5% 0.16 147);
-  --color-surface-shadow: oklch(16% 0.06 147);
+  --color-surface-shadow: oklch(45% 0.06 147);
   --color-shadow-strength: 0.8;
   --color-brand: oklch(88% 0.24 147);
 }
@@ -96,7 +96,7 @@
   --color-surface-2: oklch(87% 0.06 250);
   --color-surface-3: oklch(80% 0.1 250);
   --color-surface-4: oklch(76% 0.13 250);
-  --color-surface-shadow: oklch(17% 0.03 250);
+  --color-surface-shadow: oklch(85% 0.13 250);
   --color-shadow-strength: 0.2;
   --color-brand: oklch(62% 0.22 250);
 }
@@ -120,7 +120,7 @@
   --color-surface-2: oklch(94.6% 0.033 307.174);
   --color-surface-3: oklch(90.2% 0.063 306.703);
   --color-surface-4: oklch(82.7% 0.119 306.383);
-  --color-surface-shadow: oklch(29.1% 0.149 302.717);
+  --color-surface-shadow: oklch(50.1% 0.149 302.717);
   --color-shadow-strength: 0.02;
   --color-brand: oklch(62.7% 0.265 303.9);
 }
@@ -132,7 +132,7 @@
   --color-surface-2: oklch(35.07% 0.0715 53.66);
   --color-surface-3: oklch(41.02% 0.0913 52.35);
   --color-surface-4: oklch(46.93% 0.1111 51.22);
-  --color-surface-shadow: oklch(28.05% 0.0533 54.07);
+  --color-surface-shadow: oklch(45% 0.0533 54.07);
   --color-shadow-strength: 0.2;
   --color-brand: oklch(70.12% 0.1357 53.79);
 }
@@ -251,14 +251,16 @@ body::-webkit-scrollbar-thumb {
   font-weight: 600;
   text-decoration: none;
   letter-spacing: -0.05em;
-  background-color: var(--color-clr-neon-pink);
-  color: oklch(96.83% 0.007 247.9);
+  background-color: var(--color-brand);
+  color: oklch(
+    96.83% 0.007 247.9
+  ); /* You can make this dynamic too if needed */
   padding: 0.5em 1em;
   border-radius: 6px;
   box-shadow:
-    0 10px 20px oklch(69.55% 0.31 331.65 / 50%),
-    0 6px 6px oklch(69.55% 0.31 331.65 / 50%),
-    0 0 100px -10px var(--color-clr-neon-pink);
+    0 10px 20px color-mix(in oklch, var(--color-brand) 50%, transparent),
+    0 6px 6px color-mix(in oklch, var(--color-brand) 50%, transparent),
+    0 0 100px -10px var(--color-brand);
   transition:
     transform 0.3s,
     box-shadow 0.3s;
@@ -267,9 +269,13 @@ body::-webkit-scrollbar-thumb {
 .btn:hover {
   transform: translateY(-3px);
   box-shadow:
-    0 14px 28px oklch(69.55% 0.31 331.65 / 25%),
-    0 10px 10px oklch(69.55% 0.31 331.65 / 22%),
-    0 0 120px -10px var(--color-clr-neon-pink);
+    0 14px 28px color-mix(in oklch, var(--color-brand) 25%, transparent),
+    0 10px 10px color-mix(in oklch, var(--color-brand) 22%, transparent),
+    0 0 120px -10px var(--color-brand);
+}
+
+.input-field {
+  @apply border-brand bg-surface-1 focus:ring-brand mt-1 w-full rounded-md border p-2 focus:outline-none focus:ring-2;
 }
 
 @theme {

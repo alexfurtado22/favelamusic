@@ -1,47 +1,89 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static widget_tweaks %}
 {% block body %}
-    <h1>Create a New Artist</h1>
-    <form action="" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <label for="id_name">Name:</label>
-        <input type="text" name="name" id="id_name" required>
-        <br>
-        <br>
-        <label for="id_picture">Picture:</label>
-        <input type="file" name="picture" id="id_picture">
-        <br>
-        <br>
-        <label for="id_track">Track:</label>
-        <input type="file" name="track" id="id_track">
-        <br>
-        <br>
-        <label for="id_video">Video:</label>
-        <input type="file" name="video" id="id_video">
-        <br>
-        <br>
-        <label for="id_genre">Genre:</label>
-        <input type="text" name="genre" id="id_genre">
-        <br>
-        <br>
-        <label for="id_content">Content:</label>
-        <textarea name="content" id="id_content" rows="4"></textarea>
-        <br>
-        <br>
-        <label for="id_producer">Producer:</label>
-        <input type="text" name="producer" id="id_producer">
-        <br>
-        <br>
-        <label for="id_twitter">Twitter:</label>
-        <input type="url" name="twitter" id="id_twitter">
-        <br>
-        <br>
-        <label for="id_instagram">Instagram:</label>
-        <input type="url" name="instagram" id="id_instagram">
-        <br>
-        <br>
-        <button type="submit">Create Artist</button>
-    </form>
-    <br>
-    <a href="{% url 'home' %}">Back to Home</a>
+    <div class="col-span-2">
+        <h1>Create a New Artist</h1>
+        <form x-data="artistCreate()"
+              action="{% url 'create_artist' %}"
+              method="post"
+              enctype="multipart/form-data"
+              class="space-y-6">
+            {% csrf_token %}
+            <!-- Name Field -->
+            <fieldset class="mb-4 space-y-1">
+                {% render_field form.name class="input-field placeholder-text-1" placeholder="Artist name" x-model="name" %}
+                <div class="flex justify-end text-xs">
+                    <span x-text="`${65 - name.length} characters remaining`"
+                          :class="{ 'text-text-1': (65 - name.length) >= 50, 'text-yellow-500': (65 - name.length) < 50 && (65 - name.length) >= 20, 'text-red-500': (65 - name.length) < 20 }"></span>
+                </div>
+            </fieldset>
+            <div class="grid grid-cols-3 justify-center items-center gap-4 max-xl:grid-cols-1 border border-brand rounded-md p-4 ">
+                <!-- Picture Upload -->
+                <fieldset class="mb-4 space-y-1 text-center">
+                    <label for="{{ form.picture.id_for_label }}"
+                           class="block text-sm font-medium">{{ form.picture.label }}</label>
+                    <label for="{{ form.picture.id_for_label }}"
+                           class="inline-block cursor-pointer bg-brand px-4 text-white py-2 rounded hover:bg-brand/70 transition">
+                        Choose Picture
+                    </label>
+                    {% render_field form.picture class="hidden input-field" %}
+                    <p id="filename-picture" class="text-sm  mt-1">No file selected</p>
+                </fieldset>
+                <!-- Track Upload -->
+                <fieldset class="mb-4 space-y-1 text-center">
+                    <label for="{{ form.track.id_for_label }}" class="block text-sm font-medium">{{ form.track.label }}</label>
+                    <label for="{{ form.track.id_for_label }}"
+                           class="inline-block cursor-pointer bg-brand px-4 text-white py-2 rounded hover:bg-brand/70 transition">
+                        Choose Track
+                    </label>
+                    {% render_field form.track class="hidden input-field" %}
+                    <p id="filename-track" class="text-sm mt-1">No file selected</p>
+                </fieldset>
+                <!-- Video Upload -->
+                <fieldset class="mb-4 space-y-1 text-center">
+                    <label for="{{ form.video.id_for_label }}" class="block text-sm font-medium">{{ form.video.label }}</label>
+                    <label for="{{ form.video.id_for_label }}"
+                           class="inline-block cursor-pointer bg-brand px-4 text-white py-2 rounded hover:bg-brand/70 transition">
+                        Choose Video
+                    </label>
+                    {% render_field form.video class="hidden input-field" %}
+                    <p id="filename-video" class="text-sm mt-1">No file selected</p>
+                </fieldset>
+            </div>
+            <!-- Genre -->
+            <fieldset class="mb-4 space-y-1">
+                <label for="{{ form.genre.id_for_label }}" class="block">Genre</label>
+                {% render_field form.genre class="input-field" %}
+            </fieldset>
+            <!-- Producer -->
+            <fieldset class="mb-4 space-y-1">
+                <label for="{{ form.producer.id_for_label }}" class="block">Producer</label>
+                {% render_field form.producer class="input-field" placeholder="Producer" %}
+            </fieldset>
+            <!-- Content -->
+            <fieldset class="mb-4 space-y-1">
+                <label for="{{ form.content.id_for_label }}" class="block font-medium">Content</label>
+                {% render_field form.content class="input-field placeholder-text-1" placeholder="Describe the artist" %}
+            </fieldset>
+            <!-- Instagram -->
+            <fieldset class="mb-4 space-y-1">
+                {% render_field form.instagram class="input-field placeholder-text-1" placeholder="Instagram handle" x-model="instagram" %}
+            </fieldset>
+            <!-- Twitter -->
+            <fieldset class="mb-4 space-y-1">
+                {% render_field form.twitter class="input-field  placeholder-text-1" placeholder="Twitter handle" x-model="twitter" %}
+            </fieldset>
+            <!-- Submit Section -->
+            <div class="flex items-center space-x-4 mt-6">
+                <button type="submit" class="btn">Create Artist</button>
+                <a href="{% url 'home' %}"
+                   class=" ml-auto text-surface-shadow hover:text-surface-shadow/70">Back to list</a>
+            </div>
+        </form>
+    </div>
 {% endblock body %}
+{% block page_js %}
+    <script src="{% static 'color_schemes.js' %}"></script>
+    <script src="{% static 'index.js' %}"></script>
+    <script src="{% static 'uploader.js' %}"></script>
+{% endblock page_js %}

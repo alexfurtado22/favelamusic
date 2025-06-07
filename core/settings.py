@@ -10,10 +10,32 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from a .env file located at the project root
+# This loads a base .env file if it exists.
+load_dotenv(os.path.join(BASE_DIR, ".env"))
+
+# Load environment-specific .env files based on an explicit ENVIRONMENT variable.
+# Normalize to lowercase after stripping any surrounding whitespace.
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "").strip().lower()
+
+if ENVIRONMENT == "local":
+    # If ENVIRONMENT is 'local', load .env.local and allow it to override existing variables.
+    load_dotenv(os.path.join(BASE_DIR, ".env.local"), override=True)
+elif ENVIRONMENT == "prod":
+    # If ENVIRONMENT is 'docker', load .env.docker and allow it to override existing variables.
+    load_dotenv(os.path.join(BASE_DIR, ".env.docker"), override=True)
+# You can add more 'elif' blocks here for other environments like 'production', 'staging', etc.
+
+# After the above steps, your Django settings can safely access environment variables
+# using os.environ.get('YOUR_VARIABLE_NAME').
 
 
 # Quick-start development settings - unsuitable for production
@@ -44,6 +66,7 @@ INSTALLED_APPS = [
     "tailwind",
     "theme",
     "django_browser_reload",
+    "widget_tweaks",
 ]
 
 MIDDLEWARE = [
@@ -56,6 +79,23 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
+
+if DEBUG:
+    INSTALLED_APPS += ["debug_toolbar"]
+
+    MIDDLEWARE += [
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+    ]
+
+    import socket
+
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+
+    INTERNAL_IPS = [ip[:-1] + "1" for ip in ips] + ["127.0.0.1"]
+    INTERNAL_IPS += [
+        "192.168.65.1",
+    ]
+
 
 ROOT_URLCONF = "core.urls"
 
@@ -107,6 +147,10 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "login"
 
 
 # Internationalization

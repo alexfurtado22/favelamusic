@@ -5,6 +5,7 @@ from app.views import (
     ArtistDeleteView,
     ArtistListView,
     ArtistUpdateView,
+    ProducerCreateView,
 )
 
 urlpatterns = [
@@ -12,4 +13,7 @@ urlpatterns = [
     path("artists/create/", ArtistCreateView.as_view(), name="create_artist"),
     path("artists/<int:pk>/update/", ArtistUpdateView.as_view(), name="update_artist"),
     path("artists/<int:pk>/delete/", ArtistDeleteView.as_view(), name="delete_artist"),
+    path(
+        "artists/producer/create/", ProducerCreateView.as_view(), name="create_producer"
+    ),
 ]

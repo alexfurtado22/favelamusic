@@ -1,47 +1,195 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static widget_tweaks %}
 {% block body %}
-    <h1>Edit Artist</h1>
-    <form action="" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <label for="id_name">Name:</label>
-        <input type="text" name="name" id="id_name" required>
-        <br>
-        <br>
-        <label for="id_picture">Picture:</label>
-        <input type="file" name="picture" id="id_picture">
-        <br>
-        <br>
-        <label for="id_track">Track:</label>
-        <input type="file" name="track" id="id_track">
-        <br>
-        <br>
-        <label for="id_video">Video:</label>
-        <input type="file" name="video" id="id_video">
-        <br>
-        <br>
-        <label for="id_genre">Genre:</label>
-        <input type="text" name="genre" id="id_genre">
-        <br>
-        <br>
-        <label for="id_content">Content:</label>
-        <textarea name="content" id="id_content" rows="4"></textarea>
-        <br>
-        <br>
-        <label for="id_producer">Producer:</label>
-        <input type="text" name="producer" id="id_producer">
-        <br>
-        <br>
-        <label for="id_twitter">Twitter:</label>
-        <input type="url" name="twitter" id="id_twitter">
-        <br>
-        <br>
-        <label for="id_instagram">Instagram:</label>
-        <input type="url" name="instagram" id="id_instagram">
-        <br>
-        <br>
-        <button type="submit">Update Artist</button>
-    </form>
-    <br>
-    <a href="{% url 'home' %}">Back to Home</a>
+    <div class="col-span-2">
+        <h1 class="text-2xl">Update Artist</h1>
+        <p>Last edited on {{ artist.updated_at | date:"jS F Y" }}</p>
+        <form action="{% url 'update_artist' artist.pk %}"
+              method="post"
+              enctype="multipart/form-data"
+              class="space-y-6">
+            {% csrf_token %}
+            {# Display non-field errors if any #}
+            {% if form.non_field_errors %}
+                <div class="text-red-500 text-sm mt-2">
+                    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                </div>
+            {% endif %}
+            <fieldset class="mb-4 space-y-1">
+                <label for="{{ form.name.id_for_label }}" class="block sr-only">Artist Name</label>
+                {# Added sr-only label for accessibility #}
+                {% render_field form.name class="input-field placeholder-text-1" placeholder="Artist name" %}
+                {% if form.name.errors %}
+                    <ul class="text-red-500 text-sm mt-1">
+                        {% for error in form.name.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </fieldset>
+            <h2 class="text-center">Upload Media</h2>
+            <div class="grid grid-cols-3 justify-center items-center gap-4 max-md:grid-cols-1  max-xxl:grid-cols-1">
+                <fieldset class="mb-4 space-y-1 text-center flex flex-col items-center border rounded-md p-4">
+                    <label for="{{ form.picture.id_for_label }}"
+                           class="block text-lg font-medium">{{ form.picture.label }}</label>
+                    <label for="{{ form.picture.id_for_label }}"
+                           class="inline-block cursor-pointer bg-brand px-4 text-white py-2 rounded hover:bg-brand/70 transition">
+                        Choose Picture
+                    </label>
+                    {# Render the actual file input as hidden #}
+                    {% render_field form.picture class="hidden" %}
+                    <p id="filename-picture" class="text-sm mt-1">
+                        {# Display current filename if exists, otherwise "No file selected" #}
+                        {% if artist.picture %}
+                            Current: {{ artist.picture.name|truncatechars:30 }}
+                            <a href="{{ artist.picture.url }}"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="text-blue-500 hover:underline ml-1">(View)</a>
+                        {% else %}
+                            No file selected
+                        {% endif %}
+                    </p>
+                    {# Add a checkbox for clearing the file, and make sure its name matches Django's expectation #}
+                    {% if artist.picture %}
+                        <div class="flex items-center mt-2">
+                            <input type="checkbox"
+                                   name="{{ form.picture.html_name }}-clear"
+                                   id="{{ form.picture.id_for_label }}-clear"
+                                   class="mr-2">
+                            <label for="{{ form.picture.id_for_label }}-clear" class="text-sm">Clear current picture</label>
+                        </div>
+                    {% endif %}
+                    {% if form.picture.errors %}
+                        <ul class="text-red-500 text-sm mt-1">
+                            {% for error in form.picture.errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                </fieldset>
+                <fieldset class="mb-4 space-y-1 text-center flex flex-col items-center border rounded-md p-4">
+                    <label for="{{ form.track.id_for_label }}" class="block text-lg font-medium">{{ form.track.label }}</label>
+                    <label for="{{ form.track.id_for_label }}"
+                           class="inline-block cursor-pointer bg-brand px-4 text-white py-2 rounded hover:bg-brand/70 transition">
+                        Choose Track
+                    </label>
+                    {% render_field form.track class="hidden" %}
+                    <p id="filename-track" class="text-sm mt-1">
+                        {% if artist.track %}
+                            Current: {{ artist.track.name|truncatechars:30 }}
+                            <a href="{{ artist.track.url }}"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="text-blue-500 hover:underline ml-1">(Play)</a>
+                        {% else %}
+                            No file selected
+                        {% endif %}
+                    </p>
+                    {% if artist.track %}
+                        <div class="flex items-center mt-2">
+                            <input type="checkbox"
+                                   name="{{ form.track.html_name }}-clear"
+                                   id="{{ form.track.id_for_label }}-clear"
+                                   class="mr-2">
+                            <label for="{{ form.track.id_for_label }}-clear" class="text-sm">Clear current track</label>
+                        </div>
+                    {% endif %}
+                    {% if form.track.errors %}
+                        <ul class="text-red-500 text-sm mt-1">
+                            {% for error in form.track.errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                </fieldset>
+                <fieldset class="mb-4 space-y-1 text-center flex flex-col items-center border rounded-md p-4">
+                    <label for="{{ form.video.id_for_label }}" class="block text-lg font-medium">{{ form.video.label }}</label>
+                    <label for="{{ form.video.id_for_label }}"
+                           class="inline-block cursor-pointer bg-brand px-4 text-white py-2 rounded hover:bg-brand/70 transition">
+                        Choose Video
+                    </label>
+                    {% render_field form.video class="hidden" %}
+                    <p id="filename-video" class="text-sm mt-1">
+                        {% if artist.video %}
+                            Current: {{ artist.video.name|truncatechars:30 }}
+                            <a href="{{ artist.video.url }}"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="text-blue-500 hover:underline ml-1">(View)</a>
+                        {% else %}
+                            No file selected
+                        {% endif %}
+                    </p>
+                    {% if artist.video %}
+                        <div class="flex items-center mt-2">
+                            <input type="checkbox"
+                                   name="{{ form.video.html_name }}-clear"
+                                   id="{{ form.video.id_for_label }}-clear"
+                                   class="mr-2">
+                            <label for="{{ form.video.id_for_label }}-clear" class="text-sm">Clear current video</label>
+                        </div>
+                    {% endif %}
+                    {% if form.video.errors %}
+                        <ul class="text-red-500 text-sm mt-1">
+                            {% for error in form.video.errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                </fieldset>
+            </div>
+            <fieldset class="mb-4 space-y-1">
+                <label for="{{ form.genre.id_for_label }}" class="block">Genre</label>
+                {% render_field form.genre class="input-field" %}
+                {% if form.genre.errors %}
+                    <ul class="text-red-500 text-sm mt-1">
+                        {% for error in form.genre.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </fieldset>
+            <fieldset class="mb-4 space-y-1">
+                <label for="{{ form.producer.id_for_label }}" class="block">Producer</label>
+                {% render_field form.producer class="input-field" placeholder="Producer" %}
+                {% if form.producer.errors %}
+                    <ul class="text-red-500 text-sm mt-1">
+                        {% for error in form.producer.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </fieldset>
+            <fieldset class="mb-4 space-y-1">
+                <label for="{{ form.content.id_for_label }}" class="block font-medium">Content</label>
+                {% render_field form.content class="input-field placeholder-text-1" placeholder="Describe the artist" %}
+                {% if form.content.errors %}
+                    <ul class="text-red-500 text-sm mt-1">
+                        {% for error in form.content.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </fieldset>
+            <fieldset class="mb-4 space-y-1">
+                <label for="{{ form.instagram.id_for_label }}" class="block sr-only">Instagram Handle</label>
+                {# Added sr-only label for accessibility #}
+                {% render_field form.instagram class="input-field placeholder-text-1" placeholder="Instagram handle" %}
+                {% if form.instagram.errors %}
+                    <ul class="text-red-500 text-sm mt-1">
+                        {% for error in form.instagram.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </fieldset>
+            <fieldset class="mb-4 space-y-1">
+                <label for="{{ form.twitter.id_for_label }}" class="block sr-only">Twitter Handle</label>
+                {# Added sr-only label for accessibility #}
+                {% render_field form.twitter class="input-field placeholder-text-1" placeholder="Twitter handle" %}
+                {% if form.twitter.errors %}
+                    <ul class="text-red-500 text-sm mt-1">
+                        {% for error in form.twitter.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </fieldset>
+            <div class="flex items-center space-x-4 max-sm:flex-col max-sm:space-x-0 max-sm:space-y-6 mt-6">
+                <button type="submit" class="btn">Update Artist</button>
+                <a href="{% url 'home' %}"
+                   class="ml-auto text-surface-shadow hover:text-surface-shadow/70 max-sm:ml-0">Back to list</a>
+                <a href="{% url 'delete_artist' artist.pk %}"
+                   class="ml-auto text-brand hover:text-brand/70 max-sm:ml-0">Delete Artist</a>
+            </div>
+        </form>
+    </div>
 {% endblock body %}
+{% block page_js %}
+    <script src="{% static 'color_schemes.js' %}"></script>
+    <script src="{% static 'uploader.js' %}"></script>
+    <script src="{% static 'artist_update_media_handler.js' %}"></script>
+{% endblock page_js %}

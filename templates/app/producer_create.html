@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static widget_tweaks %}
+{% block body %}
+    <div class="col-span-2">
+        <h1>Create a New Producer</h1>
+        <form x-data="producerCreate()"
+              action="{% url 'create_producer' %}"
+              method="post"
+              class="space-y-6">
+            {% csrf_token %}
+            <!-- Name -->
+            <fieldset class="mb-4 space-y-1">
+                {% render_field form.name class="input-field placeholder-text-1" placeholder="Producer name" x-model="name" %}
+                <div class="flex justify-end text-xs">
+                    <span x-text="`${65 - name.length} characters remaining`"
+                          :class="{ 'text-text-1': (65 - name.length) >= 50, 'text-yellow-500': (65 - name.length) < 50 && (65 - name.length) >= 20, 'text-red-500': (65 - name.length) < 20 }">
+                    </span>
+                </div>
+            </fieldset>
+            <!-- Company -->
+            <fieldset class="mb-4 space-y-1">
+                {% render_field form.company class="input-field placeholder-text-1" placeholder="Company name" x-model="company" %}
+                <div class="flex justify-end text-xs">
+                    <span x-text="`${65 - company.length} characters remaining`"
+                          :class="{ 'text-text-1': (65 - company.length) >= 50, 'text-yellow-500': (65 - company.length) < 50 && (65 - company.length) >= 20, 'text-red-500': (65 - company.length) < 20 }">
+                    </span>
+                </div>
+            </fieldset>
+            <!-- Email -->
+            <fieldset class="mb-4 space-y-1">
+                {% render_field form.email class="input-field placeholder-text-1" placeholder="Email address" %}
+            </fieldset>
+            <!-- Website -->
+            <fieldset class="mb-4 space-y-1">
+                {% render_field form.website class="input-field placeholder-text-1" placeholder="Website URL" %}
+            </fieldset>
+            <!-- Submit -->
+            <div class="flex items-center space-x-4 mt-6">
+                <button type="submit" class="btn">Create Producer</button>
+                <a href="{% url 'home' %}"
+                   class="ml-auto text-surface-shadow hover:text-surface-shadow/70">Back to list</a>
+            </div>
+        </form>
+    </div>
+{% endblock body %}
+{% block page_js %}
+    <script src="{% static 'color_schemes.js' %}"></script>
+    <script src="{% static 'index.js' %}"></script>
+{% endblock page_js %}

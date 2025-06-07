@@ -158,6 +158,19 @@ wheels = [
 ]
 
 [[package]]
+name = "django-debug-toolbar"
+version = "5.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "sqlparse" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2a/9f/97ba2648f66fa208fc7f19d6895586d08bc5f0ab930a1f41032e60f31a41/django_debug_toolbar-5.2.0.tar.gz", hash = "sha256:9e7f0145e1a1b7d78fcc3b53798686170a5b472d9cf085d88121ff823e900821", size = 297901, upload-time = "2025-04-29T05:23:57.533Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fa/c2/ed3cb815002664349e9e50799b8c00ef15941f4cad797247cadbdeebab02/django_debug_toolbar-5.2.0-py3-none-any.whl", hash = "sha256:15627f4c2836a9099d795e271e38e8cf5204ccd79d5dbcd748f8a6c284dcd195", size = 262834, upload-time = "2025-04-29T05:23:55.472Z" },
+]
+
+[[package]]
 name = "django-extensions"
 version = "4.1"
 source = { registry = "https://pypi.org/simple" }
@@ -184,6 +197,15 @@ wheels = [
 [package.optional-dependencies]
 reload = [
     { name = "django-browser-reload" },
+]
+
+[[package]]
+name = "django-widget-tweaks"
+version = "1.5.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a5/fe/26eb92fba83844e71bbec0ced7fc2e843e5990020e3cc676925204031654/django-widget-tweaks-1.5.0.tar.gz", hash = "sha256:1c2180681ebb994e922c754804c7ffebbe1245014777ac47897a81f57cc629c7", size = 14767, upload-time = "2023-08-25T15:29:12.778Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/46/6a/6cb6deb5c38b785c77c3ba66f53051eada49205979c407323eb666930915/django_widget_tweaks-1.5.0-py3-none-any.whl", hash = "sha256:a41b7b2f05bd44d673d11ebd6c09a96f1d013ee98121cb98c384fe84e33b881e", size = 8960, upload-time = "2023-08-25T15:29:05.644Z" },
 ]
 
 [[package]]
@@ -234,6 +256,7 @@ dependencies = [
     { name = "django" },
     { name = "django-extensions" },
     { name = "django-tailwind-4", extra = ["reload"] },
+    { name = "django-widget-tweaks" },
     { name = "editorconfig" },
     { name = "filetype" },
     { name = "idna" },
@@ -247,6 +270,7 @@ dependencies = [
     { name = "pip" },
     { name = "pygments" },
     { name = "python-dateutil" },
+    { name = "python-dotenv" },
     { name = "python-slugify" },
     { name = "pyyaml" },
     { name = "regex" },
@@ -262,6 +286,7 @@ dependencies = [
 dev = [
     { name = "cookiecutter" },
     { name = "cssbeautifier" },
+    { name = "django-debug-toolbar" },
     { name = "djlint" },
     { name = "jsbeautifier" },
     { name = "rich" },
@@ -280,6 +305,7 @@ requires-dist = [
     { name = "django", specifier = ">=5.2.1" },
     { name = "django-extensions", specifier = ">=4.1" },
     { name = "django-tailwind-4", extras = ["reload"] },
+    { name = "django-widget-tweaks", specifier = ">=1.5.0" },
     { name = "editorconfig", specifier = ">=0.17.0" },
     { name = "filetype", specifier = ">=1.2.0" },
     { name = "idna", specifier = ">=3.10" },
@@ -293,6 +319,7 @@ requires-dist = [
     { name = "pip", specifier = ">=25.1.1" },
     { name = "pygments", specifier = ">=2.19.1" },
     { name = "python-dateutil", specifier = ">=2.9.0.post0" },
+    { name = "python-dotenv", specifier = ">=1.1.0" },
     { name = "python-slugify", specifier = ">=8.0.4" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "regex", specifier = ">=2024.11.6" },
@@ -308,6 +335,7 @@ requires-dist = [
 dev = [
     { name = "cookiecutter", specifier = ">=2.6.0" },
     { name = "cssbeautifier", specifier = ">=1.15.4" },
+    { name = "django-debug-toolbar", specifier = ">=5.2.0" },
     { name = "djlint", specifier = ">=1.36.4" },
     { name = "jsbeautifier", specifier = ">=1.15.4" },
     { name = "rich", specifier = ">=14.0.0" },
@@ -482,6 +510,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/66/c0/0c8b6ad9f17a802ee498c46e004a0eb49bc148f2fd230864601a86dcf6db/python-dateutil-2.9.0.post0.tar.gz", hash = "sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3", size = 342432, upload-time = "2024-03-01T18:36:20.211Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ec/57/56b9bcc3c9c6a792fcbaf139543cee77261f3651ca9da0c93f5c1221264b/python_dateutil-2.9.0.post0-py2.py3-none-any.whl", hash = "sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427", size = 229892, upload-time = "2024-03-01T18:36:18.57Z" },
+]
+
+[[package]]
+name = "python-dotenv"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/88/2c/7bb1416c5620485aa793f2de31d3df393d3686aa8a8506d11e10e13c5baf/python_dotenv-1.1.0.tar.gz", hash = "sha256:41f90bc6f5f177fb41f53e87666db362025010eb28f60a01c9143bfa33a2b2d5", size = 39920, upload-time = "2025-03-25T10:14:56.835Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1e/18/98a99ad95133c6a6e2005fe89faedf294a748bd5dc803008059409ac9b1e/python_dotenv-1.1.0-py3-none-any.whl", hash = "sha256:d7c01d9e2293916c18baf562d95698754b0dbbb5e74d457c45d4f6561fb9d55d", size = 20256, upload-time = "2025-03-25T10:14:55.034Z" },
 ]
 
 [[package]]

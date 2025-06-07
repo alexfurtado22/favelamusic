@@ -5,7 +5,8 @@
     <p>Are you sure you want to delete the artist "{{ object.name }}"?</p>
     <form method="post">
         {% csrf_token %}
-        <button type="submit" class="text-red-600 hover:text-red-800 cursor-pointer">Delete</button>
-        <a href="{% url 'home' %}" class="ml-4 underline">Cancel</a>
+        <button type="submit" class="text-brand hover:text-brand/70 cursor-pointer">Delete</button>
+        <a href="{% url 'home' %}"
+           class="ml-4 underline text-surface-shadow hover:text-surface-shadow/70 cursor-pointer">Cancel</a>
     </form>
 {% endblock body %}
