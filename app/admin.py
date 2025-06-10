@@ -1,13 +1,17 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 
 from app.models import Artist, Producer, UserProfile
 
 
 @admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ("username", "email", "artist_count")
+class UserProfileAdmin(UserAdmin):
+    # Combine all desired fields into a single list_display
+    list_display = ("username", "email", "is_staff", "is_active", "artist_count")
     search_fields = ("username", "email")
+    # You can specify ordering
+    ordering = ("username",)
 
 
 @admin.register(Producer)

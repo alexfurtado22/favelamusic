@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block title %}
+    Contact Us
+{% endblock title %}
+{% block body %}
+    {# Matches your base.html block #}
+    <div class="col-span-2">
+        {# Using col-span-2 from your artist_create layout #}
+        <h1>Contact Us</h1>
+        {# Using h1 for consistency #}
+        <form action="{% url 'contact' %}" method="post" class="space-y-6">
+            {# Consistent spacing and layout from artist_create #}
+            {% csrf_token %}
+            {# Display Django messages (success/error) #}
+            {% if messages %}
+                <ul class="messages mb-4">
+                    {% for message in messages %}
+                        <li {% if message.tags %} class="{{ message.tags }} text-sm p-2 rounded-md {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}
+                            "
+                            {% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {# Name Field #}
+            <fieldset class="mb-4 space-y-1">
+                {# Consistent fieldset/mb-4/space-y-1 structure #}
+                <label for="{{ form.name.id_for_label }}"
+                       class="block text-sm font-bold mb-2">{{ form.name.label }}:</label>
+                {% render_field form.name class="input-field placeholder-text-1" placeholder=form.name.field.widget.attrs.placeholder %}
+                {% for error in form.name.errors %}<p class="text-red-500 text-xs italic">{{ error }}</p>{% endfor %}
+            </fieldset>
+            {# Email Field #}
+            <fieldset class="mb-4 space-y-1">
+                <label for="{{ form.email.id_for_label }}"
+                       class="block text-sm font-bold mb-2">{{ form.email.label }}:</label>
+                {% render_field form.email class="input-field placeholder-text-1" placeholder=form.email.field.widget.attrs.placeholder %}
+                {% for error in form.email.errors %}<p class="text-red-500 text-xs italic">{{ error }}</p>{% endfor %}
+            </fieldset>
+            {# Subject Field #}
+            <fieldset class="mb-4 space-y-1">
+                <label for="{{ form.subject.id_for_label }}"
+                       class="block text-sm font-bold mb-2">{{ form.subject.label }}:</label>
+                {% render_field form.subject class="input-field placeholder-text-1" placeholder=form.subject.field.widget.attrs.placeholder %}
+                {% for error in form.subject.errors %}<p class="text-red-500 text-xs italic">{{ error }}</p>{% endfor %}
+            </fieldset>
+            {# Message Field #}
+            <fieldset class="mb-4 space-y-1">
+                <label for="{{ form.message.id_for_label }}"
+                       class="block text-sm font-bold mb-2">{{ form.message.label }}:</label>
+                {% render_field form.message class="input-field placeholder-text-1" placeholder=form.message.field.widget.attrs.placeholder rows=form.message.field.widget.attrs.rows %}
+                {% for error in form.message.errors %}<p class="text-red-500 text-xs italic">{{ error }}</p>{% endfor %}
+            </fieldset>
+            {# RENDER THE HONEYPOT FIELD EXPLICITLY AND SEPARATELY #}
+            {# This ensures only the hidden input tag is rendered, without its label or wrapping div #}
+            {{ form.honeypot }}
+            {# Submit Button #}
+            <div class="flex items-center space-x-4 mt-6">
+                <button type="submit" class="btn">Send Message</button>
+                {# Use your btn class if it's universal #}
+                <a href="{% url 'home' %}"
+                   class="ml-auto text-surface-shadow hover:text-surface-shadow/70">Go to Home</a>
+            </div>
+        </form>
+    </div>
+{% endblock body %}

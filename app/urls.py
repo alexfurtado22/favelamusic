@@ -6,6 +6,8 @@ from app.views import (
     ArtistListView,
     ArtistUpdateView,
     ProducerCreateView,
+    contact_success_view,
+    contact_view,
 )
 
 urlpatterns = [
@@ -16,4 +18,6 @@ urlpatterns = [
     path(
         "artists/producer/create/", ProducerCreateView.as_view(), name="create_producer"
     ),
+    path("contact/", contact_view, name="contact"),
+    path("contact/success/", contact_success_view, name="contact_success"),
 ]

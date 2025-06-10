@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from decouple import config
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -49,25 +50,44 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTHENTICATION_BACKENDS = [
+    "allauth.account.auth_backends.AuthenticationBackend"  # Default backend
+]
+
 
 TAILWIND_APP_NAME = "theme"
 
 # Application definition
 
-INSTALLED_APPS = [
-    "app.apps.AppConfig",  # Ensure this matches your app's config
+# settings.py
+
+DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
+]
+
+THIRD_PARTY_APPS = [
     "django_extensions",
     "tailwind",
     "theme",
     "django_browser_reload",
     "widget_tweaks",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "anymail",
 ]
+
+PROJECT_APPS = [
+    "app.apps.AppConfig",  # Replace with your actual app config if different
+]
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -78,6 +98,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_browser_reload.middleware.BrowserReloadMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 if DEBUG:
@@ -150,7 +171,32 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "login"
+LOGOUT_REDIRECT_URL = "account_login"
+
+# Allauth settings
+
+ACCOUNT_LOGIN_METHODS = {"username", "email"}
+
+
+ACCOUNT_SIGNUP_FIELDS = [
+    "email*",  # * means required
+    "username*",  # required
+    "password1*",
+    "password2*",
+]
+
+ACCOUNT_UNIQUE_EMAIL = True
+# Allauth settings
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # Ensure this is set to mandatory
+SITE_ID = 1  # Essential for allauth to build correct verification links
+
+# --- django-anymail and SendGrid API Configuration ---
+EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"  # This tells Django to use Anymail for SendGrid
+ANYMAIL = {
+    "SENDGRID_API_KEY": config("SENDGRID_API_KEY"),  # Reads the key from your .env file
+}
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")  # Your verified sending email
+SERVER_EMAIL = DEFAULT_FROM_EMAIL  # Good practice for error emails
 
 
 # Internationalization

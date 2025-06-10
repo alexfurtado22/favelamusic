@@ -1,5 +1,4 @@
 {% load static tailwind_tags %}
-{% load static %}
 <!DOCTYPE html>
 <html lang="en" dir="ltr" data-theme="auto">
   <head>
@@ -31,9 +30,15 @@
                class="text-sm border-b-2 border-transparent hover:border-brand transition-all duration-300 ease-in-out hover:text-brand {% if request.resolver_match.url_name == 'create_artist' %}font-bold{% endif %}">
               Create new
             </a>
+            <a href="{% url 'contact' %}" {# <-- ADD THIS LINE #}
+              class="text-sm border-b-2 border-transparent hover:border-brand transition-all duration-300 ease-in-out hover:text-brand {% if request.resolver_match.url_name == 'contact' %}font-bold{% endif %}">
+              Contact Us
+            </a>
             {% if user.is_authenticated %}
               <span class="text-sm text-brand">Hi, {{ user.username }}!</span>
-              <form method="post" action="{% url 'logout' %}" class="inline text-sm">
+              <form method="post"
+                    action="{% url 'account_logout' %}"
+                    class="inline text-sm">
                 {% csrf_token %}
                 <button type="submit"
                         class="text-sm border-b-2 border-transparent hover:border-brand transition-all duration-300 ease-in-out hover:text-brand">
@@ -41,7 +46,7 @@
                 </button>
               </form>
             {% else %}
-              <a href="{% url 'login' %}"
+              <a href="{% url 'account_login' %}"
                  class="text-sm border-b-2 border-transparent hover:border-brand transition-all duration-300 ease-in-out hover:text-brand">
                 Login
               </a>
@@ -69,9 +74,13 @@
              class="text-sm border-b-2 border-transparent hover:border-brand transition-all duration-300 ease-in-out hover:text-brand {% if request.resolver_match.url_name == 'create_artist' %}font-bold{% endif %}">
             Create
           </a>
+          <a href="{% url 'contact' %}" {# <-- ADD THIS LINE #}
+            class="text-sm border-b-2 border-transparent hover:border-brand transition-all duration-300 ease-in-out hover:text-brand {% if request.resolver_match.url_name == 'contact' %}font-bold{% endif %}">
+            Contact Us
+          </a>
           {% if user.is_authenticated %}
             <span class="block text-sm text-brand">Hi, {{ user.username }}!</span>
-            <form method="post" action="{% url 'logout' %}">
+            <form method="post" action="{% url 'account_logout' %}">
               {% csrf_token %}
               <button type="submit"
                       class="text-sm border-b-2 border-transparent hover:border-brand transition-all duration-300 ease-in-out hover:text-brand">
@@ -79,7 +88,7 @@
               </button>
             </form>
           {% else %}
-            <a href="{% url 'login' %}"
+            <a href="{% url 'account_login' %}"
                class="text-sm hover:underline hover:text-brand">Login</a>
           {% endif %}
         </div>
