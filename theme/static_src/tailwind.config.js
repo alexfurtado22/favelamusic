@@ -6,6 +6,7 @@
  */
 
 module.exports = {
+  darkMode: ["class"],
   content: [
     /**
      * HTML. Paths to Django template files that will contain Tailwind CSS classes.
@@ -65,6 +66,10 @@ module.exports = {
       },
       boxShadow: {
         soft: "0 2px 4px oklch(var(--color-surface-shadow) / var(--color-shadow-strength))",
+      },
+      backgroundImage: {
+        "light-radial-grid": "radial-gradient(#cecfd3 1px, transparent 1px)",
+        "dark-radial-grid": "radial-gradient(#a0a1a4 1px, transparent 1px)",
       },
     },
   },

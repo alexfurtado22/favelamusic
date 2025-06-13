@@ -1,11 +1,16 @@
 import os
+import re  # <-- Import re for regular expressions
 
 import filetype
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
-from django.core.validators import URLValidator
+from django.core.validators import (
+    URLValidator,  # <-- Already imported, but noting its use here
+)
 from django.db import models
+
+# --- (Your GENRE_MUSIC, UserProfile, Producer classes remain the same) ---
 
 GENRE_MUSIC = (
     ("Rock", "Rock"),
@@ -71,10 +76,9 @@ def validate_video_file(video):
 
     ext = os.path.splitext(video.name)[1].lower()
 
-    # Read a bit from the file to guess its type
     initial_pos = video.tell()
     video.seek(0)
-    kind = filetype.guess(video.read(261))  # Only needs a small chunk
+    kind = filetype.guess(video.read(261))
     video.seek(initial_pos)
 
     if kind is None or kind.mime != "video/mp4" or ext != ".mp4":
@@ -82,7 +86,6 @@ def validate_video_file(video):
 
 
 def validate_mp3_file(file):
-    # Max file size: 10 MB (or change to your preference)
     max_size = 10 * 1024 * 1024
     if file.size > max_size:
         raise ValidationError("Audio file too large (max 10 MB).")
@@ -99,18 +102,60 @@ def validate_mp3_file(file):
         raise ValidationError("Only .mp3 audio files are allowed.")
 
 
+# --- New/Improved URL Validators ---
+
+
 def validate_twitter_url(value):
-    validator = URLValidator()
-    validator(value)
-    if "twitter.com" not in value:
+    try:
+        URLValidator()(value)  # Basic URL validation
+    except ValidationError:
+        raise ValidationError("Please enter a valid URL.")
+
+    # More specific check to ensure it's a Twitter URL (handles various subdomains like x.com)
+    if not re.match(
+        r"^(https?://)?(www\.)?(twitter\.com|x\.com)/[a-zA-Z0-9_]+/?$", value
+    ):
         raise ValidationError("Enter a valid Twitter URL.")
 
 
 def validate_instagram_url(value):
-    validator = URLValidator()
-    validator(value)
-    if "instagram.com" not in value:
+    try:
+        URLValidator()(value)  # Basic URL validation
+    except ValidationError:
+        raise ValidationError("Please enter a valid URL.")
+
+    # More specific check to ensure it's an Instagram URL
+    if not re.match(r"^(https?://)?(www\.)?instagram\.com/[a-zA-Z0-9_.]+$", value):
         raise ValidationError("Enter a valid Instagram URL.")
+
+
+def validate_youtube_url(value):
+    try:
+        URLValidator()(value)  # Basic URL validation
+    except ValidationError:
+        raise ValidationError("Please enter a valid URL.")
+
+    # Regular expression to match common YouTube video and playlist URLs.
+    # It covers:
+    # - Standard youtube.com/watch?v=...
+    # - Shortened youtu.be/...
+    # - youtube-nocookie.com (for privacy-enhanced embeds)
+    # - embed/ and v/ formats
+    # - Playlist URLs
+    youtube_regex = (
+        r"(https?://)?(www\.)?"
+        "(youtube|youtu|youtube-nocookie)\.(com|be)/"
+        "(watch\?v=|embed/|v/|.+\?v=)?([^&=%\?]{11})"  # Matches 11-char video IDs
+        "([?&].*)?"  # Allows for additional query parameters
+        "|(https?://)?(www\.)?"
+        "youtube\.com/playlist\?list=([^&=%\?]+)"  # Matches playlist IDs
+    )
+
+    if not re.match(youtube_regex, value):
+        raise ValidationError("Please enter a valid YouTube video or playlist URL.")
+
+
+# --- Your Artist Model (with added youtube_link) ---
 
 
 class Artist(models.Model):
@@ -127,8 +172,14 @@ class Artist(models.Model):
         blank=False,
         validators=[validate_mp3_file],
     )
-    video = models.FileField(
+    video = models.FileField(  # This is for uploaded video files, not YouTube links
         upload_to="videos", null=True, blank=True, validators=[validate_video_file]
+    )
+    # New field for YouTube link
+    youtube_link = models.URLField(
+        blank=True,
+        null=True,  # Allow it to be optional
+        validators=[validate_youtube_url],  # Apply the new validator here
     )
     genre = models.CharField(
         max_length=20,
@@ -145,9 +196,7 @@ class Artist(models.Model):
     )
     content = models.TextField(blank=True, default="")
     twitter = models.URLField(blank=True, validators=[validate_twitter_url])
-
     instagram = models.URLField(blank=True, validators=[validate_instagram_url])
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

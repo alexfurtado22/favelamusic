@@ -7,10 +7,36 @@ from app.models import Artist, Producer, UserProfile
 
 @admin.register(UserProfile)
 class UserProfileAdmin(UserAdmin):
-    # Combine all desired fields into a single list_display
+    fieldsets = (
+        (None, {"fields": ("email", "username", "password")}),
+        ("Personal info", {"fields": ("first_name", "last_name")}),
+        (
+            "Permissions",
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                )
+            },
+        ),
+        ("Important dates", {"fields": ("last_login", "date_joined")}),
+    )
+
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("username", "email", "password1", "password2"),
+            },
+        ),
+    )
+
     list_display = ("username", "email", "is_staff", "is_active", "artist_count")
     search_fields = ("username", "email")
-    # You can specify ordering
     ordering = ("username",)
 
 
@@ -24,6 +50,7 @@ class ProducerAdmin(admin.ModelAdmin):
 @admin.register(Artist)
 class ArtistAdmin(admin.ModelAdmin):
     list_display = (
+        "id",
         "name",
         "genre",
         "creator",

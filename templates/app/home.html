@@ -1,111 +1,141 @@
 {% extends "base.html" %}
 {% load static %}
 {% block body %}
-    <div class="col-span-2 text-center my-12">
-        <h1 class=" text-fluid-4 font-extrabold tracking-tight mb-4">Welcome to FavelaMusic</h1>
-        <p class="text-lg mb-4">Explore your favorite music themes with dynamic color schemes.</p>
-        <a href="{% url 'create_artist' %}"
-           class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand hover:bg-brand/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out">
-            Create New Artist
-            <span class="ml-2">✨</span>
-        </a>
-    </div>
-    <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 max-sm:grid-cols-1 mb-6">
-        {% for artist in artists %}
-            <div class=" grid grid-rows-subgrid row-span-8 border border-brand rounded-md shadow-md justify-center items-center text-center p-4 ">
-                <div class="mb-4">
-                    <h2 class="text-xl font-semibold mb-2">
-                        <a href="{% url 'update_artist' artist.pk %}"
-                           class="text-brand hover:text-brand/70 transition duration-300 ease-in-out inline-flex items-center gap-2 group"
-                           title="Click to update artist">
-                            {{ artist.name }}
-                            <span class="ml-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">✏️</span>
-                        </a>
-                    </h2>
-                </div>
-                {% if artist.picture %}
-                    <div class="my-4">
-                        <img src="{{ artist.picture.url }}"
-                             alt="{{ artist.name }}"
-                             width="350"
-                             height="350"
-                             class="w-full h-auto object-cover rounded-md">
+    <div class="col-span-2 text-center">
+        <div class="flex flex-col justify-center items-center text-center my-4 bg-[radial-gradient(#a0a1a4_1px,transparent_1px)]  [background-size:16px_16px] ">
+            <img id="logo" {# This is the ID for the logo #}
+                src="{% static 'img/girl_white.svg' %}"
+                alt="FavelaMusic Logo"
+                width="auto"
+                height="80"
+                class="h-80 w-auto max-sm:h-30" />
+                <h1 class="text-fluid-4 max-sm:text-fluid-1 font-extrabold tracking-tight mb-4">Welcome to FavelaMusic</h1>
+                <p class="text-lg mb-4">Explore your favorite music themes with dynamic color schemes.</p>
+                <a href="{% url 'create_artist' %}"
+                   class="inline-flex items-center px-6 py-3 border mb-4 border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand hover:bg-brand/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand transition duration-300 ease-in-out max-sm:text-xs">
+                    Create New Artist <span class="ml-2">✨</span>
+                </a>
+            </div>
+        </div>
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 max-md:grid-cols-1 mb-6 ">
+            {% for artist in artists %}
+                <div class="grid grid-rows-subgrid row-span-8 border border-brand rounded-md shadow-md justify-center items-center text-center p-4 ">
+                    <div class="mb-4">
+                        <h2 class="text-xl font-semibold mb-2">
+                            {# ONLY show the update link if the user is authenticated AND is the artist's creator #}
+                            {% if user.is_authenticated and artist.creator == user %}
+                                <a href="{% url 'update_artist' pk=artist.pk %}"
+                                   class="text-brand hover:text-brand/70 transition duration-300 ease-in-out inline-flex items-center gap-2 group"
+                                   title="Click to update artist">
+                                    {{ artist.name }}
+                                    <span class="ml-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">✏️</span>
+                                </a>
+                            {% else %}
+                                {# If the user is NOT the creator, just display the name without the link #}
+                                <span class="text-brand">{{ artist.name }}</span>
+                                {# You could add a title here like "View Artist Details" if you have a detail page #}
+                            {% endif %}
+                        </h2>
                     </div>
-                {% endif %}
-                <div class="my-4">
-                    <p class="text-sm">
-                        <strong>Genre:</strong> {{ artist.genre }}
-                    </p>
-                </div>
-                {% if artist.producer %}
+                    {% if artist.picture %}
+                        <div class="my-4">
+                            <img src="{{ artist.picture.url }}"
+                                 alt="{{ artist.name }}"
+                                 width="350"
+                                 height="350"
+                                 class="w-full h-auto object-cover rounded-md">
+                        </div>
+                    {% endif %}
                     <div class="my-4">
                         <p class="text-sm">
-                            <strong>Producer:</strong><span class="text-brand ml-2">{{ artist.producer.name }}</span>
+                            <strong>Genre:</strong> {{ artist.genre }}
                         </p>
                     </div>
-                {% endif %}
-                {% if artist.track %}
-                    <div class="my-4">
-                        <audio controls class="w-full">
-                            <source src="{{ artist.track.url }}" type="audio/mpeg">
-                            Your browser does not support the audio element.
-                        </audio>
-                    </div>
-                {% endif %}
-                {% if artist.video %}
-                    <div class="my-4">
-                        <video controls class="w-full rounded-lg">
-                            <source src="{{ artist.video.url }}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                {% endif %}
-                {% if artist.content %}
-                    <div class="my-4 border border-brand rounded-md p-4">
-                        <p>{{ artist.content }}</p>
-                    </div>
-                {% endif %}
-                <div class="flex justify-between my-4 gap-4 max-sm:flex-col max-sm:items-center">
-                    {% if artist.instagram %}
-                        <div class="flex items-center space-x-2">
-                            <a href="{{ artist.instagram }}"
-                               target="_blank"
-                               class="hover:underline font-medium max-sm:text-sm">Instagram</a>
-                            <span>
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 50 50"
-                                    width="20px"
-                                    height="20px"
-                                    fill="currentColor"
-                                    aria-hidden="true" {# Good for accessibility #}
-                                    >
-                                    <path d="M 16 3 C 8.8324839 3 3 8.8324839 3 16 L 3 34 C 3 41.167516 8.8324839 47 16 47 L 34 47 C 41.167516 47 47 41.167516 47 34 L 47 16 C 47 8.8324839 41.167516 3 34 3 L 16 3 z M 16 5 L 34 5 C 40.086484 5 45 9.9135161 45 16 L 45 34 C 45 40.086484 40.086484 45 34 45 L 16 45 C 9.9135161 45 5 40.086484 5 34 L 5 16 C 5 9.9135161 9.9135161 5 16 5 z M 37 11 A 2 2 0 0 0 35 13 A 2 2 0 0 0 37 15 A 2 2 0 0 0 39 13 A 2 2 0 0 0 37 11 z M 25 14 C 18.936712 14 14 18.936712 14 25 C 14 31.063288 18.936712 36 25 36 C 31.063288 36 36 31.063288 36 25 C 36 18.936712 31.063288 14 25 14 z M 25 16 C 29.982407 16 34 20.017593 34 25 C 34 29.982407 29.982407 34 25 34 C 20.017593 34 16 29.982407 16 25 C 16 20.017593 20.017593 16 25 16 z" />
-                                </svg>
-                            </span>
+                    {% if artist.producer %}
+                        <div class="my-4">
+                            <p class="text-sm">
+                                <strong>Producer:</strong><span class="text-brand ml-2">{{ artist.producer.name }}</span>
+                            </p>
                         </div>
                     {% endif %}
-                    {% if artist.twitter %}
-                        <div class="flex items-center space-x-2">
-                            <a href="{{ artist.twitter }}"
-                               target="_blank"
-                               class="hover:underline font-medium max-sm:text-sm">Twitter</a>
-                            <span>
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 50 50"
-                                    width="20px"
-                                    height="20px"
-                                    fill="currentColor"
-                                    aria-hidden="true" {# Good for accessibility #}
-                                    >
-                                    <path d="M 5.9199219 6 L 20.582031 27.375 L 6.2304688 44 L 9.4101562 44 L 21.986328 29.421875 L 31.986328 44 L 44 44 L 28.681641 21.669922 L 42.199219 6 L 39.029297 6 L 27.275391 19.617188 L 17.933594 6 L 5.9199219 6 z M 9.7167969 8 L 16.880859 8 L 40.203125 42 L 33.039062 42 L 9.7167969 8 z" />
-                                </svg>
-                            </span>
+                    {% if artist.track %}
+                        <div class="my-4">
+                            <audio controls class="w-full">
+                                <source src="{{ artist.track.url }}" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
                         </div>
                     {% endif %}
+                    {% if artist.video %}
+                        <div class="my-4">
+                            <video controls class="w-full rounded-lg">
+                                <source src="{{ artist.video.url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    {% endif %}
+                    {% if artist.content %}
+                        <div class="my-4 border border-brand rounded-md p-4">
+                            <p>{{ artist.content }}</p>
+                        </div>
+                    {% endif %}
+                    <div class="flex justify-between my-4 gap-4 max-sm:flex-col max-sm:items-center">
+                        {% if artist.instagram %}
+                            <div class="flex items-center space-x-2">
+                                <a href="{{ artist.instagram }}"
+                                   target="_blank"
+                                   class="hover:underline font-medium max-sm:text-sm">Instagram</a>
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 50 50"
+                                        width="20px"
+                                        height="20px"
+                                        fill="currentColor"
+                                        aria-hidden="true" {# Good for accessibility #}
+                                        >
+                                        <path d="M 16 3 C 8.8324839 3 3 8.8324839 3 16 L 3 34 C 3 41.167516 8.8324839 47 16 47 L 34 47 C 41.167516 47 47 41.167516 47 34 L 47 16 C 47 8.8324839 41.167516 3 34 3 L 16 3 z M 16 5 L 34 5 C 40.086484 5 45 9.9135161 45 16 L 45 34 C 45 40.086484 40.086484 45 34 45 L 16 45 C 9.9135161 45 5 40.086484 5 34 L 5 16 C 5 9.9135161 9.9135161 5 16 5 z M 37 11 A 2 2 0 0 0 35 13 A 2 2 0 0 0 37 15 A 2 2 0 0 0 39 13 A 2 2 0 0 0 37 11 z M 25 14 C 18.936712 14 14 18.936712 14 25 C 14 31.063288 18.936712 36 25 36 C 31.063288 36 36 31.063288 36 25 C 36 18.936712 31.063288 14 25 14 z M 25 16 C 29.982407 16 34 20.017593 34 25 C 34 29.982407 29.982407 34 25 34 C 20.017593 34 16 29.982407 16 25 C 16 20.017593 20.017593 16 25 16 z" />
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <a href="{{ artist.youtube }}"
+                                   target="_blank"
+                                   class="hover:underline font-medium max-sm:text-sm">Youtube</a>
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 50 50"
+                                        width="25px"
+                                        height="25px"
+                                        fill="currentColor"
+                                        aria-hidden="true" {# Good for accessibility #}
+                                        >
+                                        <path d="M 24.402344 9 C 17.800781 9 11.601563 9.5 8.300781 10.199219 C 6.101563 10.699219 4.199219 12.199219 3.800781 14.5 C 3.402344 16.898438 3 20.5 3 25 C 3 29.5 3.398438 33 3.898438 35.5 C 4.300781 37.699219 6.199219 39.300781 8.398438 39.800781 C 11.902344 40.5 17.898438 41 24.5 41 C 31.101563 41 37.097656 40.5 40.597656 39.800781 C 42.800781 39.300781 44.699219 37.800781 45.097656 35.5 C 45.5 33 46 29.402344 46.097656 24.902344 C 46.097656 20.402344 45.597656 16.800781 45.097656 14.300781 C 44.699219 12.101563 42.800781 10.5 40.597656 10 C 37.097656 9.5 31 9 24.402344 9 Z M 24.402344 11 C 31.601563 11 37.398438 11.597656 40.199219 12.097656 C 41.699219 12.5 42.898438 13.5 43.097656 14.800781 C 43.699219 18 44.097656 21.402344 44.097656 24.902344 C 44 29.199219 43.5 32.699219 43.097656 35.199219 C 42.800781 37.097656 40.800781 37.699219 40.199219 37.902344 C 36.597656 38.601563 30.597656 39.097656 24.597656 39.097656 C 18.597656 39.097656 12.5 38.699219 9 37.902344 C 7.5 37.5 6.300781 36.5 6.101563 35.199219 C 5.300781 32.398438 5 28.699219 5 25 C 5 20.398438 5.402344 17 5.800781 14.902344 C 6.101563 13 8.199219 12.398438 8.699219 12.199219 C 12 11.5 18.101563 11 24.402344 11 Z M 19 17 L 19 33 L 33 25 Z M 21 20.402344 L 29 25 L 21 29.597656 Z" />
+                                    </svg>
+                                </span>
+                            </div>
+                        {% endif %}
+                        {% if artist.twitter %}
+                            <div class="flex items-center space-x-2">
+                                <a href="{{ artist.twitter }}"
+                                   target="_blank"
+                                   class="hover:underline font-medium max-sm:text-sm">Twitter</a>
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 50 50"
+                                        width="20px"
+                                        height="20px"
+                                        fill="currentColor"
+                                        aria-hidden="true" {# Good for accessibility #}
+                                        >
+                                        <path d="M 5.9199219 6 L 20.582031 27.375 L 6.2304688 44 L 9.4101562 44 L 21.986328 29.421875 L 31.986328 44 L 44 44 L 28.681641 21.669922 L 42.199219 6 L 39.029297 6 L 27.275391 19.617188 L 17.933594 6 L 5.9199219 6 z M 9.7167969 8 L 16.880859 8 L 40.203125 42 L 33.039062 42 L 9.7167969 8 z" />
+                                    </svg>
+                                </span>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-        {% empty %}
-            <p class="text-center col-span-full">No artists found.</p>
-        {% endfor %}
-    </div>
-{% endblock body %}
+            {% empty %}
+                <p class="text-center col-span-full">No artists found.</p>
+            {% endfor %}
+        </div>
+    {% endblock body %}

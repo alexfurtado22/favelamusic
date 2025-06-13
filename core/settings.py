@@ -175,7 +175,7 @@ LOGOUT_REDIRECT_URL = "account_login"
 
 # Allauth settings
 
-ACCOUNT_LOGIN_METHODS = {"username", "email"}
+ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 
 
 ACCOUNT_SIGNUP_FIELDS = [

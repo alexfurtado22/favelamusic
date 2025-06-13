@@ -137,6 +137,52 @@
   --color-brand: oklch(70.12% 0.1357 53.79);
 }
 
+/* In styles.css */
+
+.bg-light-radial-grid {
+  background-image: radial-gradient(#cecfd3 1px, transparent 1px);
+}
+
+.dark .bg-dark-radial-grid {
+  /* This is the key for dark mode */
+  background-image: radial-gradient(#a0a1a4 1px, transparent 1px);
+}
+
+/* And then your background-size */
+.background-size-16px-16px {
+  /* Or however it's generated */
+  background-size: 16px 16px;
+}
+
+/* Hide both by default */
+.theme-logo-light,
+.theme-logo-dark {
+  display: none;
+}
+
+/* Show light logo for light-based themes */
+[data-theme="light"] .theme-logo-light,
+[data-theme="grape"] .theme-logo-light,
+[data-theme="blue"] .theme-logo-light {
+  display: block;
+}
+
+/* Show dark logo for dark-based themes */
+[data-theme="dark"] .theme-logo-dark,
+[data-theme="dim"] .theme-logo-dark,
+[data-theme="choco"] .theme-logo-dark,
+[data-theme="lime"] .theme-logo-dark {
+  display: block;
+}
+.theme-icon {
+  color: #f54a00; /* light mode */
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme-icon {
+    color: white; /* or another color */
+  }
+}
 html {
   block-size: 100%;
 }

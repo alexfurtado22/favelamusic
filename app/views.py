@@ -30,6 +30,7 @@ class ArtistCreateView(LoginRequiredMixin, CreateView):
         "producer",
         "twitter",
         "instagram",
+        "youtube_link",
     ]
     success_url = reverse_lazy("home")
 
@@ -51,6 +52,7 @@ class ArtistUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         "producer",
         "twitter",
         "instagram",
+        "youtube_link",
     ]
     success_url = reverse_lazy("home")
     context_object_name = "artist"
