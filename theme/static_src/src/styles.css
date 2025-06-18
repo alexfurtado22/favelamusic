@@ -36,6 +36,7 @@
   --color-shadow-strength: 0.02;
   --color-brand: oklch(64.6% 0.222 41.116);
   --color-clr-neon-pink: oklch(69.55% 0.31 331.65);
+  --color-grid-dot: oklch(0.8549 0.0056 274.95);
 }
 
 /* Dark mode fallback for auto */
@@ -50,6 +51,7 @@
     --color-surface-shadow: oklch(45% 0.034 259.733);
     --color-shadow-strength: 0.8;
     --color-brand: oklch(83.7% 0.128 66.29);
+    --color-grid-dot: oklch(37.3% 0.034 259.733);
   }
 }
 
@@ -64,6 +66,7 @@
   --color-surface-shadow: oklch(27.8% 0.033 256.848);
   --color-shadow-strength: 0.02;
   --color-brand: oklch(64.6% 0.222 41.116);
+  --color-grid-dot: oklch(0.8549 0.0056 274.95);
 }
 
 [data-theme="dark"] {
@@ -76,6 +79,7 @@
   --color-surface-shadow: oklch(45% 0.034 259.733);
   --color-shadow-strength: 0.8;
   --color-brand: oklch(83.7% 0.128 66.29);
+  --color-grid-dot: oklch(37.3% 0.034 259.733);
 }
 
 [data-theme="lime"] {
@@ -88,6 +92,7 @@
   --color-surface-shadow: oklch(45% 0.06 147);
   --color-shadow-strength: 0.8;
   --color-brand: oklch(88% 0.24 147);
+  --color-grid-dot: oklch(0.4 0.08 147);
 }
 [data-theme="blue"] {
   --color-text-1: oklch(42% 0.15 250);
@@ -99,6 +104,7 @@
   --color-surface-shadow: oklch(85% 0.13 250);
   --color-shadow-strength: 0.2;
   --color-brand: oklch(62% 0.22 250);
+  --color-grid-dot: oklch(70% 0.08 250);
 }
 
 [data-theme="dim"] {
@@ -111,6 +117,7 @@
   --color-surface-shadow: oklch(26.21% 0.0095 248.19);
   --color-shadow-strength: 0.2;
   --color-brand: oklch(75% 0.183 55.934);
+  --color-grid-dot: oklch(50% 0.01 248);
 }
 
 [data-theme="grape"] {
@@ -123,6 +130,7 @@
   --color-surface-shadow: oklch(50.1% 0.149 302.717);
   --color-shadow-strength: 0.02;
   --color-brand: oklch(62.7% 0.265 303.9);
+  --color-grid-dot: oklch(70% 0.05 305);
 }
 
 [data-theme="choco"] {
@@ -135,23 +143,7 @@
   --color-surface-shadow: oklch(45% 0.0533 54.07);
   --color-shadow-strength: 0.2;
   --color-brand: oklch(70.12% 0.1357 53.79);
-}
-
-/* In styles.css */
-
-.bg-light-radial-grid {
-  background-image: radial-gradient(#cecfd3 1px, transparent 1px);
-}
-
-.dark .bg-dark-radial-grid {
-  /* This is the key for dark mode */
-  background-image: radial-gradient(#a0a1a4 1px, transparent 1px);
-}
-
-/* And then your background-size */
-.background-size-16px-16px {
-  /* Or however it's generated */
-  background-size: 16px 16px;
+  --color-grid-dot: oklch(35.07% 0.0715 53.66);
 }
 
 /* Hide both by default */

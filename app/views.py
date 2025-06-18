@@ -2,11 +2,18 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.mail import send_mail
+from django.db.models import Count, Prefetch
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
 
-from app.models import Artist, Producer
+from app.models import Artist, Producer, UserProfile
 
 from .forms import ContactForm
 
@@ -15,6 +22,33 @@ class ArtistListView(ListView):
     model = Artist
     template_name = "app/home.html"
     context_object_name = "artists"
+
+    def get_queryset(self):
+        # This part is already correct and efficient.
+        queryset = (
+            super()
+            .get_queryset()
+            .select_related("creator", "producer", "producer__creator")
+        )
+        return queryset
+
+    # --- ADD THIS ENTIRE METHOD TO THE CLASS ---
+    def get_context_data(self, **kwargs):
+        # Get the default data
+        context = super().get_context_data(**kwargs)
+
+        # If a user is logged in...
+        if self.request.user.is_authenticated:
+            # ...run one single, efficient query to get their artist count...
+            user_with_count = UserProfile.objects.annotate(
+                artist_count_annotated=Count("artists")
+            ).get(pk=self.request.user.pk)
+
+            # ...and add the result to the template data.
+            context["annotated_user"] = user_with_count
+
+        # Return all the data to the template
+        return context
 
 
 class ArtistCreateView(LoginRequiredMixin, CreateView):
@@ -150,3 +184,26 @@ def contact_view(request):
 
 def contact_success_view(request):
     return render(request, "app/contact_success.html")
+
+
+class UserProfileDetailView(DetailView):
+    model = UserProfile
+    template_name = "app/userprofile_detail.html"
+    context_object_name = "profile_user"
+    slug_field = "username"
+    slug_url_kwarg = "username"
+
+    def get_queryset(self):
+        queryset = (
+            super()
+            .get_queryset()
+            .annotate(artist_count_annotated=Count("artists"))
+            # === THIS IS THE CORRECTED LINE ===
+            .prefetch_related(
+                Prefetch(
+                    "artists",
+                    queryset=Artist.objects.select_related("producer", "creator"),
+                )
+            )
+        )
+        return queryset

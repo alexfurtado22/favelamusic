@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.db.models import Count
 from django.utils.html import format_html
 
 from app.models import Artist, Producer, UserProfile
@@ -7,6 +8,7 @@ from app.models import Artist, Producer, UserProfile
 
 @admin.register(UserProfile)
 class UserProfileAdmin(UserAdmin):
+    # --- (Your fieldsets remain the same) ---
     fieldsets = (
         (None, {"fields": ("email", "username", "password")}),
         ("Personal info", {"fields": ("first_name", "last_name")}),
@@ -24,7 +26,6 @@ class UserProfileAdmin(UserAdmin):
         ),
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
-
     add_fieldsets = (
         (
             None,
@@ -34,10 +35,26 @@ class UserProfileAdmin(UserAdmin):
             },
         ),
     )
+    # --- END of unchanged fieldsets ---
 
-    list_display = ("username", "email", "is_staff", "is_active", "artist_count")
+    # 3. CHANGED: Use a new method name here instead of "artist_count"
+    list_display = ("username", "email", "is_staff", "is_active", "get_artist_count")
     search_fields = ("username", "email")
     ordering = ("username",)
+
+    # 4. ADDED: The get_queryset method to perform the efficient query
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        queryset = queryset.annotate(_artist_count=Count("artists", distinct=True))
+        return queryset
+
+    # 5. ADDED: The method to display the pre-calculated count
+    def get_artist_count(self, obj):
+        return obj._artist_count
+
+    # This makes the column header nice and allows sorting
+    get_artist_count.short_description = "Artist Count"
+    get_artist_count.admin_order_field = "_artist_count"
 
 
 @admin.register(Producer)

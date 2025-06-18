@@ -28,7 +28,9 @@ GENRE_MUSIC = (
 
 
 class UserProfile(AbstractUser):
-    pass
+    email = models.EmailField(unique=True)  # unique and required by default
+
+    REQUIRED_FIELDS = ["email"]
 
     @property
     def artist_count(self):
@@ -135,21 +137,11 @@ def validate_youtube_url(value):
     except ValidationError:
         raise ValidationError("Please enter a valid URL.")
 
-    # Regular expression to match common YouTube video and playlist URLs.
-    # It covers:
-    # - Standard youtube.com/watch?v=...
-    # - Shortened youtu.be/...
-    # - youtube-nocookie.com (for privacy-enhanced embeds)
-    # - embed/ and v/ formats
-    # - Playlist URLs
-    youtube_regex = (
-        r"(https?://)?(www\.)?"
-        "(youtube|youtu|youtube-nocookie)\.(com|be)/"
-        "(watch\?v=|embed/|v/|.+\?v=)?([^&=%\?]{11})"  # Matches 11-char video IDs
-        "([?&].*)?"  # Allows for additional query parameters
-        "|(https?://)?(www\.)?"
-        "youtube\.com/playlist\?list=([^&=%\?]+)"  # Matches playlist IDs
-    )
+    # Use a raw string (r"...") to avoid syntax warnings
+    youtube_regex = r"(https?://)?(www\.)?(youtube|youtu|youtube-nocookie)\.(com|be)/(watch\?v=|embed/|v/|.+\?v=)?([^&=%\?]{11})([?&].*)?|(https?://)?(www\.)?youtube\.com/playlist\?list=([^&=%\?]+)"
+
+    if not re.match(youtube_regex, value):
+        raise ValidationError("Please enter a valid YouTube video or playlist URL.")
 
     if not re.match(youtube_regex, value):
         raise ValidationError("Please enter a valid YouTube video or playlist URL.")

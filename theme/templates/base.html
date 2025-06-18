@@ -22,120 +22,150 @@
   <body data-static-prefix="{% static '' %}">
     <main class="holder grid min-h-dvh grid-cols-2 items-start justify-center">
       <nav class="px-6 py-4 col-span-2 bg-transparent mb-4"
-           x-data="{ menuOpen: false }">
+        x-data="{ menuOpen: false }" {# Alpine.js: Controls the visibility of the mobile menu #}
+        role="navigation">
+        {# ARIA: Accessibility role for screen readers #}
         <div class="flex justify-between items-center">
-          <!-- Logo -->
           <a href="{% url 'home' %}"
              class="flex items-center gap-2 max-sm:flex-col">
-            <img id="minilogo" {# This is the ID for the logo #}
-              src="{% static 'img/girl_white.svg' %}"
-              alt="FavelaMusic Logo"
-              width="auto"
-              height="20"
-              class="h-20 w-auto" />
-              <span class="text-xl  font-semibold">FavelaMusic</span>
-            </a>
-            <!-- Desktop Nav -->
-            <div class="space-x-4 flex items-center max-md:hidden">
-              <a href="{% url 'home' %}"
-                 class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'home' %}font-bold{% endif %}">
-                Home
-              </a>
-              <a href="{% url 'create_artist' %}"
-                 class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'create_artist' %}font-bold{% endif %}">
-                Create New
-              </a>
-              <a href="{% url 'contact' %}"
-                 class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'contact' %}font-bold{% endif %}">
-                Contact Us
-              </a>
-              {% if user.is_authenticated %}
-                <span class="text-sm text-brand">Hi, {{ user.username }}!</span>
-                <form method="post" action="{% url 'account_logout' %}" class="inline">
-                  {% csrf_token %}
-                  <button type="submit"
-                          class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all">
-                    Logout
-                  </button>
-                </form>
-              {% else %}
-                <a href="{% url 'account_login' %}"
-                   class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all">
-                  Login
-                </a>
-              {% endif %}
-            </div>
-            <!-- Hamburger Menu Button -->
-            <button @click="menuOpen = !menuOpen" class="block md:hidden">
-              <svg xmlns="http://www.w3.org/2000/svg"
-                   fill="none"
-                   viewBox="0 0 24 24"
-                   stroke-width="1.5"
-                   stroke="currentColor"
-                   class="h-6 w-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-              </svg>
-            </button>
-          </div>
-          <!-- Mobile Nav -->
-          <div x-show="menuOpen" class="md:hidden mt-4 flex flex-col space-y-2">
+            {# Tailwind: Sets dimensions, hides this specific logo instance on large screens and down #}
+            {% include "svgs/favelamusic.svg" with class="h-10 w-auto max-md:hidden " %}
+          </a>
+          <div class="space-x-4 flex items-center max-md:hidden">
+            {# Tailwind: Defines horizontal spacing, flex layout, and hides this block below 'md' breakpoint #}
             <a href="{% url 'home' %}"
-               class="text-sm hover:text-brand {% if request.resolver_match.url_name == 'home' %}font-bold{% endif %}">
+               class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'home' %}font-bold{% endif %}">
               Home
             </a>
             <a href="{% url 'create_artist' %}"
-               class="text-sm hover:text-brand {% if request.resolver_match.url_name == 'create_artist' %}font-bold{% endif %}">
-              Create
+               class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'create_artist' %}font-bold{% endif %}">
+              Create New
             </a>
             <a href="{% url 'contact' %}"
-               class="text-sm hover:text-brand {% if request.resolver_match.url_name == 'contact' %}font-bold{% endif %}">
+               class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'contact' %}font-bold{% endif %}">
               Contact Us
             </a>
             {% if user.is_authenticated %}
               <span class="text-sm text-brand">Hi, {{ user.username }}!</span>
-              <form method="post" action="{% url 'account_logout' %}">
-                {% csrf_token %}
-                <button type="submit" class="text-sm hover:text-brand">Logout</button>
+              <form method="post" action="{% url 'account_logout' %}" class="inline">
+                {% csrf_token %} {# Django: Security token for forms #}
+                <button type="submit" class="btn">Logout</button>
               </form>
             {% else %}
-              <a href="{% url 'account_login' %}" class="text-sm hover:text-brand">Login</a>
+              <a href="{% url 'account_login' %}" class="btn">Login</a>
             {% endif %}
           </div>
-        </nav>
-        <!-- Header with Theme Selector -->
-        <header class="col-span-2 flex items-center justify-between px-6 py-4 max-md:px-4 max-md:py-2">
-          <div class="flex items-center gap-4 max-sm:flex-col">
-            <label for="theme-switcher" class="text-sm">Select theme:</label>
-            <select id="theme-switcher"
-                    aria-label="Select color theme"
-                    class="text-xs rounded-full bg-surface-2 focus:outline-none w-fit h-fit focus:ring-0 border border-surface-3">
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-              <option value="lime">Lime</option>
-              <option value="blue">Blue</option>
-              <option value="dim">Dim</option>
-              <option value="grape">Grape</option>
-              <option value="choco">Choco</option>
-            </select>
+          <button x-show="!menuOpen"
+                  @click="menuOpen = true"
+                  class="block md:hidden"
+                  aria-label="Open menu">
+            {# Alpine.js: Hides when menuOpen is TRUE #}
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke-width="1.5"
+                 stroke="currentColor"
+                 class="h-6 w-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
+          <button x-show="menuOpen"
+                  @click="menuOpen = false"
+                  class="block md:hidden"
+                  aria-label="Close menu">
+            {# Alpine.js: Hides when menuOpen is FALSE #}
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke-width="2"
+                 stroke="currentColor"
+                 class="h-6 w-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div x-show="menuOpen" {# Alpine.js: Shows/hides this entire div based on the 'menuOpen' state #}
+          x-transition:enter="transition ease-out duration-300" {# Alpine.js: Entry animation #}
+          x-transition:enter-start="opacity-0 -translate-y-4" {# Starts invisible and slightly above #}
+          x-transition:enter-end="opacity-100 translate-y-0" {# Ends fully visible and in place #}
+          x-transition:leave="transition ease-in duration-300" {# Alpine.js: Exit animation #}
+          x-transition:leave-start="opacity-100 translate-y-0" {# Starts fully visible and in place #}
+          x-transition:leave-end="opacity-0 -translate-y-4" {# Ends invisible and slightly above #}
+          class="md:hidden mt-4 flex flex-col space-y-2 bg-surface-2/30 p-4 rounded-lg shadow-lg relative">
+          <a href="{% url 'home' %}"
+             @click="menuOpen = false"
+             class="flex justify-center mb-4 max-md:flex-col space-y-4"> {# Links to home, closes menu when clicked, centered #}
+            {# Tailwind: Sets size, ensures visibility within the menu #}
+            {% include "svgs/favelamusic.svg" with class="h-10 w-auto" %}
+          </a>
+          <div class="flex flex-col space-y-4">
+            {# Tailwind: Vertical stack with spacing, white text #}
+            <a href="{% url 'home' %}"
+              @click="menuOpen = false" {# Closes menu after clicking #}
+              class="text-sm hover:text-brand {% if request.resolver_match.url_name == 'home' %}font-bold text-brand{% endif %}">
+              Home
+            </a>
+            <a href="{% url 'create_artist' %}"
+              @click="menuOpen = false" {# Closes menu after clicking #}
+              class="text-sm hover:text-brand {% if request.resolver_match.url_name == 'create_artist' %}font-bold text-brand{% endif %}">
+              Create
+            </a>
+            <a href="{% url 'contact' %}"
+              @click="menuOpen = false" {# Closes menu after clicking #}
+              class="text-sm hover:text-brand {% if request.resolver_match.url_name == 'contact' %}font-bold text-brand{% endif %}">
+              Contact Us
+            </a>
+            {% if user.is_authenticated %}
+              <span class="text-sm text-brand mt-2">Hi, {{ user.username }}!</span> {# Margin top for separation #}
+              <form method="post" action="{% url 'account_logout' %}">
+                {% csrf_token %} {# Django: Security token #}
+                <button type="submit"
+                  @click="menuOpen = false" {# Closes menu after logout #}
+                  class="btn w-full">Logout</button>
+                {# Align text left #}
+              </form>
+            {% else %}
+              <a href="{% url 'account_login' %}"
+                @click="menuOpen = false" {# Closes menu after clicking login #}
+              class="btn text-center w-full">Login</a>
+            {% endif %}
           </div>
-        </header>
-        <!-- 🧱 Main content -->
-        <section class="col-span-2 grid grid-cols-1 items-center justify-center px-6 py-8">
-          {% block body %}
-          {% endblock body %}
-        </section>
-        <!-- 👣 Footer -->
-        <footer class="col-span-2 mt-10 py-4 text-center text-sm">
-          © {{ now|date:"Y" }} FavelaMusic. No rights reserved.
-        </footer>
-      </main>
-      {% block extra_body %}
-      {% endblock extra_body %}
-      {% block page_js %}
-        <script src="{% static 'color_schemes.js' %}"></script>
-        <script src="{% static 'svg.js' %}"></script>
-        <script src="{% static 'logo.js' %}"></script>
-        <script src="{% static 'minilogo.js' %}"></script>
-      {% endblock page_js %}
-    </body>
-  </html>
+        </div>
+      </nav>
+      <!-- Header with Theme Selector -->
+      <header class="col-span-2 flex items-center justify-between px-6 py-4 max-md:px-4 max-md:py-2">
+        <div class="flex items-center gap-4 max-sm:flex-col">
+          <label for="theme-switcher" class="text-sm">Select theme:</label>
+          <select id="theme-switcher"
+                  aria-label="Select color theme"
+                  class="text-xs rounded-full bg-surface-2 focus:outline-none w-fit h-fit focus:ring-0 border border-surface-3">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="lime">Lime</option>
+            <option value="blue">Blue</option>
+            <option value="dim">Dim</option>
+            <option value="grape">Grape</option>
+            <option value="choco">Choco</option>
+          </select>
+        </div>
+      </header>
+      <!-- 🧱 Main content -->
+      <section class="col-span-2 grid grid-cols-1 items-center justify-center px-6 py-8">
+        {% block body %}
+        {% endblock body %}
+      </section>
+      <!-- 👣 Footer -->
+      <footer class="col-span-2 mt-10 py-4 text-center text-sm">
+        © {{ now|date:"Y" }} FavelaMusic. No rights reserved.
+      </footer>
+    </main>
+    {% block extra_body %}
+    {% endblock extra_body %}
+    {% block page_js %}
+      <script src="{% static 'color_schemes.js' %}"></script>
+      <script src="{% static 'svg.js' %}"></script>
+      <script src="{% static 'logo.js' %}"></script>
+      <script src="{% static 'minilogo.js' %}"></script>
+    {% endblock page_js %}
+  </body>
+</html>

@@ -6,6 +6,7 @@ from app.views import (
     ArtistListView,
     ArtistUpdateView,
     ProducerCreateView,
+    UserProfileDetailView,
     contact_success_view,
     contact_view,
 )
@@ -20,4 +21,5 @@ urlpatterns = [
     ),
     path("contact/", contact_view, name="contact"),
     path("contact/success/", contact_success_view, name="contact_success"),
+    path("users/<str:username>/", UserProfileDetailView.as_view(), name="user-profile"),
 ]

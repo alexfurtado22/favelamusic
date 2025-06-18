@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block body %}
+    <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+        <div class="border-b pb-4 mb-6">
+            <h1 class="text-4xl font-bold text-gray-900">{{ profile_user.username }}</h1>
+            <p class="text-lg text-gray-600 mt-2">
+                {# === FIX: Use the new annotation name === #}
+                Has created <span class="font-semibold text-blue-600">{{ profile_user.artist_count_annotated }}</span> artist{{ profile_user.artist_count_annotated|pluralize }}.
+            </p>
+        </div>
+        <div>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Artists by {{ profile_user.username }}:</h2>
+            <div class="space-y-4">
+                {% for artist in profile_user.artists.all %}
+                    <div class="p-4 border rounded-md">
+                        <h3 class="font-bold text-xl text-gray-800">{{ artist.name }}</h3>
+                        <p class="text-sm text-gray-500">Genre: {{ artist.genre }}</p>
+                        {% if artist.producer %}<p class="text-sm text-gray-500">Producer: {{ artist.producer.name }}</p>{% endif %}
+                    </div>
+                {% empty %}
+                    <p class="text-gray-500">{{ profile_user.username }} has not created any artists yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock body %}
