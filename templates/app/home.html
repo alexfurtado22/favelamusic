@@ -46,13 +46,19 @@
                                 <span class="ml-2 text-fluid-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">✏️</span>
                             </a>
                         {% else %}
-                            <span class="text-brand text-fluid-1 capitalize">{{ artist.name }}</span>
+                            <a href="{% url 'artist-detail' pk=artist.pk %}"
+                               class="text-brand text-fluid-1 capitalize hover:text-brand/70">{{ artist.name }}</a>
                         {% endif %}
                     </h2>
                     <p class="text-sm">
                         create by <a href="{% url 'user-profile' username=artist.creator.username %}"
     class="font-medium text-brand hover:underline">{{ artist.creator.username }}</a>
                     </p>
+                    <p class="text-yellow-500 font-semibold">
+                        {# Use the default filter to show 'N/A' if there are no ratings #}
+                        Avg. Rating: {{ artist.avg_rating|floatformat:1|default:"N/A" }} ★
+                    </p>
+                    <p class="text-sm text-gray-500">({{ artist.num_ratings }} rating{{ artist.num_ratings|pluralize }})</p>
                 </div>
                 {% if artist.picture %}
                     <div class="my-4">

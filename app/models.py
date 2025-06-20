@@ -1,16 +1,13 @@
 import os
-import re  # <-- Import re for regular expressions
+import re
 
 import filetype
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
-from django.core.validators import (
-    URLValidator,  # <-- Already imported, but noting its use here
-)
+from django.core.validators import MaxValueValidator, MinValueValidator, URLValidator
 from django.db import models
-
-# --- (Your GENRE_MUSIC, UserProfile, Producer classes remain the same) ---
+from django.db.models import Avg
 
 GENRE_MUSIC = (
     ("Rock", "Rock"),
@@ -147,41 +144,25 @@ def validate_youtube_url(value):
         raise ValidationError("Please enter a valid YouTube video or playlist URL.")
 
 
-# --- Your Artist Model (with added youtube_link) ---
-
-
 class Artist(models.Model):
     name = models.CharField(max_length=65)
     picture = models.ImageField(
-        upload_to="profile",
-        null=True,
-        blank=True,
-        validators=[validate_image],
+        upload_to="profile", null=True, blank=True, validators=[validate_image]
     )
     track = models.FileField(
-        upload_to="tracks",
-        null=False,
-        blank=False,
-        validators=[validate_mp3_file],
+        upload_to="tracks", null=False, blank=False, validators=[validate_mp3_file]
     )
-    video = models.FileField(  # This is for uploaded video files, not YouTube links
+    video = models.FileField(
         upload_to="videos", null=True, blank=True, validators=[validate_video_file]
     )
-    # New field for YouTube link
     youtube_link = models.URLField(
-        blank=True,
-        null=True,  # Allow it to be optional
-        validators=[validate_youtube_url],  # Apply the new validator here
+        blank=True, null=True, validators=[validate_youtube_url]
     )
     genre = models.CharField(
-        max_length=20,
-        choices=GENRE_MUSIC,
-        default="Hip-Hop / Rap",
+        max_length=20, choices=GENRE_MUSIC, default="Hip-Hop / Rap"
     )
     creator = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="artists",
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="artists"
     )
     producer = models.ForeignKey(
         Producer, null=True, blank=True, on_delete=models.SET_NULL
@@ -192,5 +173,31 @@ class Artist(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # === ADDITION: A property to calculate the average rating ===
+    @property
+    def average_rating(self):
+        # Calculates the average score of all ratings, returns 0 if none exist.
+        return self.ratings.aggregate(Avg("score"))["score__avg"] or 0
+
     def __str__(self):
         return self.name
+
+
+# === ADDITION: The new model to store ratings ===
+class Rating(models.Model):
+    score = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name="ratings")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # A user can only rate an artist once
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "artist"], name="unique_user_artist_rating"
+            )
+        ]
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.score} stars for {self.artist.name} by {self.user.username}"

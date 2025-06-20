@@ -2,6 +2,8 @@
 
 from django import forms
 
+from .models import Rating
+
 
 class ContactForm(forms.Form):
     name = forms.CharField(
@@ -52,3 +54,17 @@ class ContactForm(forms.Form):
         if value:
             raise forms.ValidationError("Spam detected.")
         return value
+
+
+# === ADDITION: A new form for submitting ratings ===
+class RatingForm(forms.ModelForm):
+    class Meta:
+        model = Rating
+        fields = ["score"]
+        # Optional: Make the input look like radio buttons
+        widgets = {
+            "score": forms.RadioSelect(
+                choices=[(i, f"{i} ★") for i in range(1, 6)],
+                attrs={"class": "flex items-center space-x-2"},  # Example for styling
+            )
+        }

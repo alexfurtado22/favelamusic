@@ -2,8 +2,13 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.mail import send_mail
-from django.db.models import Count, Prefetch
-from django.shortcuts import redirect, render
+from django.db import IntegrityError  # <-- Add this import
+from django.db.models import Avg, Count, Prefetch
+from django.shortcuts import (
+    get_object_or_404,  # <-- Add this import
+    redirect,
+    render,
+)
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -13,9 +18,9 @@ from django.views.generic import (
     UpdateView,
 )
 
-from app.models import Artist, Producer, UserProfile
+from app.models import Artist, Producer, Rating, UserProfile
 
-from .forms import ContactForm
+from .forms import ContactForm, RatingForm  # <-- Add RatingForm import
 
 
 class ArtistListView(ListView):
@@ -29,7 +34,9 @@ class ArtistListView(ListView):
             super()
             .get_queryset()
             .select_related("creator", "producer", "producer__creator")
+            .annotate(avg_rating=Avg("ratings__score"), num_ratings=Count("ratings"))
         )
+        queryset = queryset.order_by("-avg_rating", "-num_ratings")
         return queryset
 
     # --- ADD THIS ENTIRE METHOD TO THE CLASS ---
@@ -207,3 +214,137 @@ class UserProfileDetailView(DetailView):
             )
         )
         return queryset
+
+
+# app/views.py
+
+
+# app/views.py
+
+
+# app/views.py
+
+
+class ArtistDetailView(DetailView):
+    model = Artist
+    template_name = "app/artist_detail.html"
+    context_object_name = "artist"
+
+    def get_queryset(self):
+        # This queryset is perfect. No changes needed here.
+        return (
+            super()
+            .get_queryset()
+            .select_related("creator", "producer")
+            .annotate(
+                avg_rating=Avg("ratings__score"),
+                num_ratings=Count("ratings"),
+            )
+            .prefetch_related("ratings__user")
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        artist = self.object
+
+        # === THIS IS THE FINAL OPTIMIZATION ===
+        user_rating = None
+        if self.request.user.is_authenticated:
+            # Instead of a new query, we loop through the ratings that
+            # were already fetched by prefetch_related. This is instant.
+            for rating in artist.ratings.all():  # This uses the prefetched cache
+                if rating.user_id == self.request.user.id:
+                    user_rating = rating
+                    break  # We found it, no need to keep looping
+
+        context["user_rating"] = user_rating
+        context["rating_form"] = RatingForm()
+        return context
+
+
+# === ADDITION: A view to process the rating form submission ===
+class RatingCreateView(LoginRequiredMixin, CreateView):
+    model = Rating
+    form_class = RatingForm
+
+    def form_valid(self, form):
+        # Get the artist object from the URL
+        artist = get_object_or_404(Artist, pk=self.kwargs["pk"])
+
+        # Assign the artist and logged-in user to the rating
+        form.instance.artist = artist
+        form.instance.user = self.request.user
+
+        try:
+            # Try to save the rating
+            messages.success(self.request, f"Thank you for rating {artist.name}!")
+            return super().form_valid(form)
+        except IntegrityError:
+            # This happens if the user already rated this artist
+            messages.warning(self.request, f"You have already rated {artist.name}.")
+            return redirect("artist-detail", pk=artist.pk)
+
+    def get_success_url(self):
+        return reverse_lazy("home")
+
+
+class RatingUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Rating
+    form_class = RatingForm
+    template_name = "app/rating_form.html"
+
+    def get_queryset(self):
+        return (
+            super().get_queryset().select_related("user", "artist", "artist__creator")
+        )
+
+    def get_object(self, queryset=None):
+        if not hasattr(self, "_cached_object"):
+            self._cached_object = super().get_object(queryset)
+        return self._cached_object
+
+    def test_func(self):
+        rating = self.get_object()
+        return self.request.user == rating.user
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["rating_form"] = RatingForm(instance=self.object)  # Pre-fill the form
+
+        user = self.request.user
+        if user.is_authenticated:
+            user_rating = self.object.artist.ratings.filter(
+                user=user
+            ).first()  # Correct: through artist
+        else:
+            user_rating = None
+
+        context["user_rating"] = user_rating
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy("home")
+
+
+# === ADDITION: View to delete a rating ===
+class RatingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Rating
+    template_name = "app/rating_confirm_delete.html"
+
+    def get_queryset(self):
+        # Join related user and artist to reduce extra queries
+        return (
+            super().get_queryset().select_related("user", "artist", "artist__creator")
+        )
+
+    def get_object(self, queryset=None):
+        if not hasattr(self, "_cached_object"):
+            self._cached_object = super().get_object(queryset)
+        return self._cached_object
+
+    def test_func(self):
+        rating = self.get_object()
+        return self.request.user == rating.user
+
+    def get_success_url(self):
+        return reverse_lazy("home")

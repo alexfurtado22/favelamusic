@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count
 from django.utils.html import format_html
 
-from app.models import Artist, Producer, UserProfile
+from app.models import Artist, Producer, Rating, UserProfile
 
 
 @admin.register(UserProfile)
@@ -125,3 +125,11 @@ class ArtistAdmin(admin.ModelAdmin):
         return "-"
 
     video_preview.short_description = "Video"
+
+
+@admin.register(Rating)
+class RatingAdmin(admin.ModelAdmin):
+    list_display = ("artist", "user", "score", "created_at")
+    list_filter = ("score", "created_at")
+    search_fields = ("artist__name", "user__username")
+    readonly_fields = ("created_at",)
