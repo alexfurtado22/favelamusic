@@ -22,17 +22,16 @@
   <body data-static-prefix="{% static '' %}">
     <main class="holder grid min-h-dvh grid-cols-2 items-start justify-center">
       <nav class="px-6 py-4 col-span-2 bg-transparent mb-4"
-        x-data="{ menuOpen: false }" {# Alpine.js: Controls the visibility of the mobile menu #}
-        role="navigation">
-        {# ARIA: Accessibility role for screen readers #}
+           x-data="{ menuOpen: false }"
+           role="navigation">
         <div class="flex justify-between items-center">
+          <!-- Logo -->
           <a href="{% url 'home' %}"
              class="flex items-center gap-2 max-sm:flex-col">
-            {# Tailwind: Sets dimensions, hides this specific logo instance on large screens and down #}
-            {% include "svgs/favelamusic.svg" with class="h-10 w-auto max-md:hidden " %}
+            {% include "svgs/favelamusic.svg" with class="h-5 w-auto max-lg:hidden" %}
           </a>
+          <!-- Desktop Menu -->
           <div class="space-x-4 flex items-center max-md:hidden">
-            {# Tailwind: Defines horizontal spacing, flex layout, and hides this block below 'md' breakpoint #}
             <a href="{% url 'home' %}"
                class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'home' %}font-bold{% endif %}">
               Home
@@ -41,6 +40,14 @@
                class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'create_artist' %}font-bold{% endif %}">
               Create New
             </a>
+            <a href="{% url 'playlist-list' %}"
+               class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'playlist-list' %}font-bold{% endif %}">
+              My Playlists
+            </a>
+            <a href="{% url 'public-playlist-list' %}"
+               class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'public-playlist-list' %}font-bold{% endif %}">
+              Explore Playlists
+            </a>
             <a href="{% url 'contact' %}"
                class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'contact' %}font-bold{% endif %}">
               Contact Us
@@ -48,18 +55,18 @@
             {% if user.is_authenticated %}
               <span class="text-sm text-brand">Hi, {{ user.username }}!</span>
               <form method="post" action="{% url 'account_logout' %}" class="inline">
-                {% csrf_token %} {# Django: Security token for forms #}
+                {% csrf_token %}
                 <button type="submit" class="btn">Logout</button>
               </form>
             {% else %}
               <a href="{% url 'account_login' %}" class="btn">Login</a>
             {% endif %}
           </div>
+          <!-- Mobile Menu Buttons -->
           <button x-show="!menuOpen"
                   @click="menuOpen = true"
                   class="block md:hidden"
                   aria-label="Open menu">
-            {# Alpine.js: Hides when menuOpen is TRUE #}
             <svg xmlns="http://www.w3.org/2000/svg"
                  fill="none"
                  viewBox="0 0 24 24"
@@ -73,7 +80,6 @@
                   @click="menuOpen = false"
                   class="block md:hidden"
                   aria-label="Close menu">
-            {# Alpine.js: Hides when menuOpen is FALSE #}
             <svg xmlns="http://www.w3.org/2000/svg"
                  fill="none"
                  viewBox="0 0 24 24"
@@ -84,50 +90,54 @@
             </svg>
           </button>
         </div>
-        <div x-show="menuOpen" {# Alpine.js: Shows/hides this entire div based on the 'menuOpen' state #}
-          x-transition:enter="transition ease-out duration-300" {# Alpine.js: Entry animation #}
-          x-transition:enter-start="opacity-0 -translate-y-4" {# Starts invisible and slightly above #}
-          x-transition:enter-end="opacity-100 translate-y-0" {# Ends fully visible and in place #}
-          x-transition:leave="transition ease-in duration-300" {# Alpine.js: Exit animation #}
-          x-transition:leave-start="opacity-100 translate-y-0" {# Starts fully visible and in place #}
-          x-transition:leave-end="opacity-0 -translate-y-4" {# Ends invisible and slightly above #}
-          class="md:hidden mt-4 flex flex-col space-y-2 bg-surface-2/30 p-4 rounded-lg shadow-lg relative">
+        <!-- Mobile Menu -->
+        <div x-show="menuOpen"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 -translate-y-4"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-300"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-4"
+             class="md:hidden mt-4 flex flex-col space-y-2 bg-surface-2/30 p-4 rounded-lg shadow-lg relative">
           <a href="{% url 'home' %}"
              @click="menuOpen = false"
-             class="flex justify-center mb-4 max-md:flex-col space-y-4"> {# Links to home, closes menu when clicked, centered #}
-            {# Tailwind: Sets size, ensures visibility within the menu #}
-            {% include "svgs/favelamusic.svg" with class="h-10 w-auto" %}
-          </a>
+             class="flex justify-center mb-4">{% include "svgs/favelamusic.svg" with class="h-10 w-auto" %}</a>
           <div class="flex flex-col space-y-4">
-            {# Tailwind: Vertical stack with spacing, white text #}
             <a href="{% url 'home' %}"
-              @click="menuOpen = false" {# Closes menu after clicking #}
-              class="text-sm hover:text-brand {% if request.resolver_match.url_name == 'home' %}font-bold text-brand{% endif %}">
+               @click="menuOpen = false"
+               class="text-sm hover:text-brand {% if request.resolver_match.url_name == 'home' %}font-bold text-brand{% endif %}">
               Home
             </a>
             <a href="{% url 'create_artist' %}"
-              @click="menuOpen = false" {# Closes menu after clicking #}
-              class="text-sm hover:text-brand {% if request.resolver_match.url_name == 'create_artist' %}font-bold text-brand{% endif %}">
-              Create
+               @click="menuOpen = false"
+               class="text-sm hover:text-brand {% if request.resolver_match.url_name == 'create_artist' %}font-bold text-brand{% endif %}">
+              Create New
+            </a>
+            <a href="{% url 'playlist-list' %}"
+               @click="menuOpen = false"
+               class="text-sm hover:text-brand {% if request.resolver_match.url_name == 'playlist-list' %}font-bold text-brand{% endif %}">
+              My Playlists
+            </a>
+            <a href="{% url 'public-playlist-list' %}"
+               @click="menuOpen = false"
+               class="text-sm hover:text-brand {% if request.resolver_match.url_name == 'public-playlist-list' %}font-bold text-brand{% endif %}">
+              Explore Playlists
             </a>
             <a href="{% url 'contact' %}"
-              @click="menuOpen = false" {# Closes menu after clicking #}
-              class="text-sm hover:text-brand {% if request.resolver_match.url_name == 'contact' %}font-bold text-brand{% endif %}">
+               @click="menuOpen = false"
+               class="text-sm hover:text-brand {% if request.resolver_match.url_name == 'contact' %}font-bold text-brand{% endif %}">
               Contact Us
             </a>
             {% if user.is_authenticated %}
-              <span class="text-sm text-brand mt-2">Hi, {{ user.username }}!</span> {# Margin top for separation #}
+              <span class="text-sm text-brand mt-2">Hi, {{ user.username }}!</span>
               <form method="post" action="{% url 'account_logout' %}">
-                {% csrf_token %} {# Django: Security token #}
-                <button type="submit"
-                  @click="menuOpen = false" {# Closes menu after logout #}
-                  class="btn w-full">Logout</button>
-                {# Align text left #}
+                {% csrf_token %}
+                <button type="submit" @click="menuOpen = false" class="btn w-full">Logout</button>
               </form>
             {% else %}
               <a href="{% url 'account_login' %}"
-                @click="menuOpen = false" {# Closes menu after clicking login #}
-              class="btn text-center w-full">Login</a>
+                 @click="menuOpen = false"
+                 class="btn text-center w-full">Login</a>
             {% endif %}
           </div>
         </div>

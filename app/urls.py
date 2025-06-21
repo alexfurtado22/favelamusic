@@ -1,21 +1,32 @@
 from django.urls import path
 
 from app.views import (
+    AddArtistToPlaylistView,
+    # Artist and Rating
     ArtistCreateView,
     ArtistDeleteView,
-    ArtistDetailView,  # <-- Add this
+    ArtistDetailView,
     ArtistListView,
     ArtistUpdateView,
+    PlaylistCreateView,
+    PlaylistDeleteView,
+    PlaylistDetailView,
+    # ✅ Playlist
+    PlaylistListView,
+    PlaylistUpdateView,
     ProducerCreateView,
+    PublicPlaylistListView,
     RatingCreateView,
     RatingDeleteView,
     RatingUpdateView,
+    # User Profile & Contact
     UserProfileDetailView,
     contact_success_view,
     contact_view,
 )
 
 urlpatterns = [
+    # 🔥 Artist and Rating
     path("", ArtistListView.as_view(), name="home"),
     path("artists/create/", ArtistCreateView.as_view(), name="create_artist"),
     path("artists/<int:pk>/update/", ArtistUpdateView.as_view(), name="update_artist"),
@@ -23,11 +34,37 @@ urlpatterns = [
     path(
         "artists/producer/create/", ProducerCreateView.as_view(), name="create_producer"
     ),
-    path("contact/", contact_view, name="contact"),
-    path("contact/success/", contact_success_view, name="contact_success"),
-    path("users/<str:username>/", UserProfileDetailView.as_view(), name="user-profile"),
     path("artists/<int:pk>/", ArtistDetailView.as_view(), name="artist-detail"),
     path("artists/<int:pk>/rate/", RatingCreateView.as_view(), name="artist-rate"),
     path("rating/<int:pk>/update/", RatingUpdateView.as_view(), name="rating-update"),
     path("rating/<int:pk>/delete/", RatingDeleteView.as_view(), name="rating-delete"),
+    # 🔥 User Profile & Contact
+    path("users/<str:username>/", UserProfileDetailView.as_view(), name="user-profile"),
+    path("contact/", contact_view, name="contact"),
+    path("contact/success/", contact_success_view, name="contact_success"),
+    # 🔥 ✅ Playlists
+    path("playlists/", PlaylistListView.as_view(), name="playlist-list"),
+    path(
+        "playlists/public/",
+        PublicPlaylistListView.as_view(),
+        name="public-playlist-list",
+    ),
+    path("playlists/create/", PlaylistCreateView.as_view(), name="playlist-create"),
+    path("playlists/<int:pk>/", PlaylistDetailView.as_view(), name="playlist-detail"),
+    path(
+        "playlists/<int:pk>/update/",
+        PlaylistUpdateView.as_view(),
+        name="playlist-update",
+    ),
+    path(
+        "playlists/<int:pk>/delete/",
+        PlaylistDeleteView.as_view(),
+        name="playlist-delete",
+    ),
+    # ✅ Add/Remove artist to/from playlist (toggle)
+    path(
+        "playlists/add-artist/",
+        AddArtistToPlaylistView.as_view(),
+        name="add-artist-to-playlist",
+    ),
 ]

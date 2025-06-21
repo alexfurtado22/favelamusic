@@ -2,7 +2,7 @@
 
 from django import forms
 
-from .models import Rating
+from .models import Playlist, Rating
 
 
 class ContactForm(forms.Form):
@@ -67,4 +67,31 @@ class RatingForm(forms.ModelForm):
                 choices=[(i, f"{i} ★") for i in range(1, 6)],
                 attrs={"class": "flex items-center space-x-2"},  # Example for styling
             )
+        }
+
+
+class PlaylistForm(forms.ModelForm):
+    class Meta:
+        model = Playlist
+        fields = ["title", "description", "is_public"]
+        widgets = {
+            "title": forms.TextInput(
+                attrs={
+                    "class": "w-full px-4 py-2 border rounded",
+                    "placeholder": "Enter playlist title",
+                }
+            ),
+            "description": forms.Textarea(
+                attrs={
+                    "class": "w-full px-4 py-2 border rounded",
+                    "placeholder": "Optional description",
+                    "rows": 3,
+                }
+            ),
+            "is_public": forms.CheckboxInput(attrs={"class": "form-checkbox"}),
+        }
+        labels = {
+            "title": "Playlist Title",
+            "description": "Description",
+            "is_public": "Public Playlist?",
         }

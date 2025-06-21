@@ -10,6 +10,7 @@ from django.shortcuts import (
     render,
 )
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -18,9 +19,9 @@ from django.views.generic import (
     UpdateView,
 )
 
-from app.models import Artist, Producer, Rating, UserProfile
+from app.models import Artist, Playlist, Producer, Rating, UserProfile
 
-from .forms import ContactForm, RatingForm  # <-- Add RatingForm import
+from .forms import ContactForm, PlaylistForm, RatingForm  # <-- Add RatingForm import
 
 
 class ArtistListView(ListView):
@@ -231,7 +232,6 @@ class ArtistDetailView(DetailView):
     context_object_name = "artist"
 
     def get_queryset(self):
-        # This queryset is perfect. No changes needed here.
         return (
             super()
             .get_queryset()
@@ -240,25 +240,35 @@ class ArtistDetailView(DetailView):
                 avg_rating=Avg("ratings__score"),
                 num_ratings=Count("ratings"),
             )
-            .prefetch_related("ratings__user")
+            .prefetch_related(
+                "ratings__user",  # Ratings
+                "playlists",  # Playlists that include this artist
+            )
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         artist = self.object
 
-        # === THIS IS THE FINAL OPTIMIZATION ===
+        # Optimized lookup for current user's rating (already cached)
         user_rating = None
         if self.request.user.is_authenticated:
-            # Instead of a new query, we loop through the ratings that
-            # were already fetched by prefetch_related. This is instant.
-            for rating in artist.ratings.all():  # This uses the prefetched cache
+            for rating in artist.ratings.all():
                 if rating.user_id == self.request.user.id:
                     user_rating = rating
-                    break  # We found it, no need to keep looping
+                    break
+
+            # ✅ Get the user's playlists for the Add/Remove buttons
+            user_playlists = Playlist.objects.filter(user=self.request.user).order_by(
+                "title"
+            )
+        else:
+            user_playlists = Playlist.objects.none()
 
         context["user_rating"] = user_rating
         context["rating_form"] = RatingForm()
+        context["user_playlists"] = user_playlists  # ✅ New line
+
         return context
 
 
@@ -348,3 +358,136 @@ class RatingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def get_success_url(self):
         return reverse_lazy("home")
+
+
+class PlaylistListView(LoginRequiredMixin, ListView):
+    """
+    Displays a list of the currently logged-in user's own playlists.
+    """
+
+    model = Playlist
+    template_name = "app/playlist_list.html"
+    context_object_name = "playlists"
+
+    def get_queryset(self):
+        return (
+            Playlist.objects.filter(user=self.request.user)
+            .annotate(num_artists=Count("artists"))
+            .prefetch_related("artists")
+        )
+
+
+class PublicPlaylistListView(ListView):
+    """
+    Displays a list of all playlists that are marked as public.
+    """
+
+    model = Playlist
+    template_name = "app/public_playlist_list.html"
+    context_object_name = "playlists"
+
+    def get_queryset(self):
+        return (
+            Playlist.objects.filter(is_public=True)
+            .annotate(num_artists=Count("artists"))
+            .select_related("user")
+            .prefetch_related("artists")
+        )
+
+
+class PlaylistDetailView(LoginRequiredMixin, DetailView):
+    model = Playlist
+    template_name = "app/playlist_detail.html"
+    context_object_name = "playlist"
+
+    def get_queryset(self):
+        # Select related user (playlist owner)
+        # Prefetch artists, but use select_related on producer to avoid extra queries per artist
+        return Playlist.objects.select_related("user").prefetch_related(
+            # Prefetch artists with annotations and select_related('producer')
+            Prefetch(
+                "artists",
+                queryset=Artist.objects.select_related("producer").annotate(
+                    avg_rating=Avg("ratings__score"), num_ratings=Count("ratings")
+                ),
+            )
+        )
+
+
+class PlaylistCreateView(LoginRequiredMixin, CreateView):
+    """
+    Handles the creation of a new playlist.
+    """
+
+    model = Playlist
+    form_class = PlaylistForm
+    template_name = "app/playlist_form.html"
+    success_url = reverse_lazy("playlist-list")
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+
+class PlaylistUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """
+    Handles updating an existing playlist.
+    """
+
+    model = Playlist
+    form_class = PlaylistForm
+    template_name = "app/playlist_form.html"
+    success_url = reverse_lazy("playlist-list")
+
+    def get_queryset(self):
+        return Playlist.objects.filter(user=self.request.user)
+
+    def test_func(self):
+        return self.get_object().user == self.request.user
+
+
+class PlaylistDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """
+    Handles the deletion of a playlist after confirmation.
+    """
+
+    model = Playlist
+    template_name = "app/playlist_confirm_delete.html"
+    success_url = reverse_lazy("playlist-list")
+
+    def get_queryset(self):
+        return Playlist.objects.filter(user=self.request.user)
+
+    def test_func(self):
+        return self.get_object().user == self.request.user
+
+
+class AddArtistToPlaylistView(LoginRequiredMixin, View):
+    """
+    Handles the POST request to add or remove an artist from a user's playlist.
+    """
+
+    def post(self, request, *args, **kwargs):
+        artist_id = request.POST.get("artist_id")
+        playlist_id = request.POST.get("playlist_id")
+
+        artist = get_object_or_404(Artist, id=artist_id)
+        playlist = get_object_or_404(
+            Playlist.objects.prefetch_related("artists"),
+            id=playlist_id,
+            user=request.user,
+        )
+
+        # Toggle the artist's existence in the playlist
+        if artist in playlist.artists.all():
+            playlist.artists.remove(artist)
+            messages.info(
+                request, f"Removed '{artist.name}' from playlist '{playlist.title}'."
+            )
+        else:
+            playlist.artists.add(artist)
+            messages.success(
+                request, f"Added '{artist.name}' to playlist '{playlist.title}'."
+            )
+
+        return redirect("artist-detail", pk=artist_id)

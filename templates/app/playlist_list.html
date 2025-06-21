@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block body %}
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-6">Your Playlists</h1>
+        <a href="{% url 'playlist-create' %}"
+           class="inline-block mb-4 px-4 py-2 bg-brand text-white rounded hover:bg-brand/80">➕ Create Playlist</a>
+        {% if playlists %}
+            <div class="grid gap-4">
+                {% for playlist in playlists %}
+                    <div class="bg-surface-2 border border-brand/30 rounded-lg p-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                {# === FIX: Added pk= === #}
+                                <a href="{% url 'playlist-detail' pk=playlist.pk %}"
+                                   class="text-xl font-semibold hover:underline">{{ playlist.title }}</a>
+                                <p class="text-sm text-muted">{{ playlist.num_artists }} artist{{ playlist.num_artists|pluralize }}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                {# === FIX: Added pk= === #}
+                                <a href="{% url 'playlist-update' pk=playlist.pk %}"
+                                   class="text-blue-500 hover:underline">Edit</a>
+                                {# === FIX: Added pk= === #}
+                                <a href="{% url 'playlist-delete' pk=playlist.pk %}"
+                                   class="text-red-500 hover:underline">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>You have no playlists yet.</p>
+        {% endif %}
+    </div>
+{% endblock body %}

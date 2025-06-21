@@ -201,3 +201,34 @@ class Rating(models.Model):
 
     def __str__(self):
         return f"{self.score} stars for {self.artist.name} by {self.user.username}"
+
+
+class Playlist(models.Model):
+    title = models.CharField(max_length=150)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="playlists"
+    )
+    artists = models.ManyToManyField(Artist, related_name="playlists", blank=True)
+    description = models.TextField(
+        blank=True, help_text="Optional description of the playlist."
+    )
+    is_public = models.BooleanField(
+        default=False, help_text="If checked, anyone can view this playlist."
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "title"], name="unique_user_playlist_title"
+            )
+        ]
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.title} ({self.user.username})"
+
+    @property
+    def artist_count(self):
+        return self.artists.count()
