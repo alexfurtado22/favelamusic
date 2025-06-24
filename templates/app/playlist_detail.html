@@ -1,41 +1,51 @@
 {% extends "base.html" %}
 {% block body %}
-    <div class="max-w-4xl mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-4">{{ playlist.title }}</h1>
-        <p class="text-sm text-muted mb-4">
-            Owned by
-            <a href="{% url 'user-profile' username=playlist.user.username %}"
-               class="underline">{{ playlist.user.username }}</a>
-            · {{ playlist.artists.all|length }} artist{{ playlist.artists.all|length|pluralize }}
-            {% if playlist.is_public %}
-                · 🌍 Public
+    <div class="col-span-2 mx-auto">
+        <div class="grid grid-cols-1 justify-center items-center">
+            <h1 class="text-3xl text-brand font-bold mb-4 text-center">{{ playlist.title }}</h1>
+            <p class="mb-4 flex justify-center items-center space-x-2 text-sm max-xs:flex-col">
+                <span>Owned by</span>
+                <a href="{% url 'user-profile' username=playlist.user.username %}"
+                   class="underline hover:text-brand">{{ playlist.user.username }}</a>
+                <span>·</span>
+                <span>{{ playlist.artists.all|length }} artist{{ playlist.artists.all|length|pluralize }}</span>
+                <span>·</span>
+                {% if playlist.is_public %}
+                    <span class="flex items-center space-x-1">
+                        <span>🌍</span>
+                        <span>Public</span>
+                    </span>
+                {% else %}
+                    <span class="flex items-center space-x-1">
+                        {% include "svgs/lock.svg" with class="size-4" %}
+                        <span>Private</span>
+                    </span>
+                {% endif %}
+            </p>
+            {% if playlist.artists.all %}
+                <div class="grid grid-cols-1 justify-center items-center gap-4">
+                    {% for artist in playlist.artists.all %}
+                        <div class="bg-surface-1/10 border border-brand/30 rounded-lg p-4">
+                            <a href="{% url 'artist-detail' pk=artist.pk %}"
+                               class="text-lg text-brand font-semibold hover:underline">{{ artist.name }}</a>
+                            <p class="text-sm text-muted">Producer: {{ artist.producer.name }}</p>
+                            <p>⭐ {{ artist.avg_rating|default:"0"|floatformat:1 }} ({{ artist.num_ratings }})</p>
+                        </div>
+                    {% endfor %}
+                </div>
             {% else %}
-                · 🔒 Private
+                <p>No artists in this playlist.</p>
             {% endif %}
-        </p>
-        {% if playlist.artists.all %}
-            <div class="grid gap-4">
-                {% for artist in playlist.artists.all %}
-                    <div class="bg-surface-2 border border-brand/30 rounded-lg p-4">
-                        <a href="{% url 'artist-detail' pk=artist.pk %}"
-                           class="text-lg font-semibold hover:underline">{{ artist.name }}</a>
-                        <p class="text-sm text-muted">Producer: {{ artist.producer.name }}</p>
-                        <p>⭐ {{ artist.avg_rating|default:"0"|floatformat:1 }} ({{ artist.num_ratings }})</p>
-                    </div>
-                {% endfor %}
+            <div class="mt-6 flex gap-4 max-sm:flex-col text-center">
+                {% if request.user == playlist.user %}
+                    <a href="{% url 'playlist-update' pk=playlist.pk %}"
+                       class=" px-4 py-2 rounded-2xl bg-brand/80 hover:bg-brand/30 text-white font-medium shadow-md transition">Edit</a>
+                    <a href="{% url 'playlist-delete' pk=playlist.pk %}"
+                       class="px-4 py-2 bg-red-500/80 text-white rounded-2xl font-medium shadow-md transition hover:bg-red-500/30">Delete</a>
+                {% endif %}
+                <a href="{% url 'playlist-list' %}"
+                   class="px-4 py-2 bg-surface-4/80 rounded-2xl font-medium shadow-md transition hover:bg-surface-4/30">Back to Playlists</a>
             </div>
-        {% else %}
-            <p>No artists in this playlist.</p>
-        {% endif %}
-        <div class="mt-6 flex gap-4">
-            {% if request.user == playlist.user %}
-                <a href="{% url 'playlist-update' pk=playlist.pk %}"
-                   class="px-4 py-2 bg-brand text-white rounded hover:bg-brand/80">Edit</a>
-                <a href="{% url 'playlist-delete' pk=playlist.pk %}"
-                   class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Delete</a>
-            {% endif %}
-            <a href="{% url 'playlist-list' %}"
-               class="px-4 py-2 bg-surface-3 text-white rounded hover:bg-surface-4">Back to Playlists</a>
         </div>
     </div>
 {% endblock body %}

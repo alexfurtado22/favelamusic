@@ -2,6 +2,8 @@
 {% load static widget_tweaks %}
 {% block body %}
     <div class="col-span-2">
+        <a href="{% url 'create_producer' %}"
+           class="underline text-text-1 hover:text-brand mb-4 inline-block">+ Add producer</a>
         <h1>Create a New Artist</h1>
         <form x-data="artistCreate()"
               action="{% url 'create_artist' %}"
@@ -79,7 +81,5 @@
 {% block page_js %}
     <script src="{% static 'color_schemes.js' %}"></script>
     <script src="{% static 'index.js' %}"></script>
-    <script src="{% static 'uploader.js' %}"></script>
-    <script src="{% static 'minilogo.js' %}"></script>
     <script src="{% static 'svg.js' %}"></script>
 {% endblock page_js %}

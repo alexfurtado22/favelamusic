@@ -1,34 +1,37 @@
 {% extends "base.html" %}
 {% block body %}
-    <div class="max-w-4xl mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-6">Your Playlists</h1>
-        <a href="{% url 'playlist-create' %}"
-           class="inline-block mb-4 px-4 py-2 bg-brand text-white rounded hover:bg-brand/80">➕ Create Playlist</a>
-        {% if playlists %}
-            <div class="grid gap-4">
-                {% for playlist in playlists %}
-                    <div class="bg-surface-2 border border-brand/30 rounded-lg p-4">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                {# === FIX: Added pk= === #}
-                                <a href="{% url 'playlist-detail' pk=playlist.pk %}"
-                                   class="text-xl font-semibold hover:underline">{{ playlist.title }}</a>
-                                <p class="text-sm text-muted">{{ playlist.num_artists }} artist{{ playlist.num_artists|pluralize }}</p>
-                            </div>
-                            <div class="flex gap-2">
-                                {# === FIX: Added pk= === #}
-                                <a href="{% url 'playlist-update' pk=playlist.pk %}"
-                                   class="text-blue-500 hover:underline">Edit</a>
-                                {# === FIX: Added pk= === #}
-                                <a href="{% url 'playlist-delete' pk=playlist.pk %}"
-                                   class="text-red-500 hover:underline">Delete</a>
+    <div class="col-span-2 flex items-center justify-center bg-surface-1/10 backdrop-blur-md">
+        <div class="w-full max-w-3xl bg-surface-1/10 border border-brand/20 rounded-2xl shadow-2xl p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl text-brand font-semibold">Your Playlists</h1>
+                <a href="{% url 'playlist-create' %}"
+                   class="flex items-center gap-1 px-4 py-2 bg-brand text-white rounded-lg hover:bg-brand/80 transition">
+                    ➕ <span>Create</span>
+                </a>
+            </div>
+            {% if playlists %}
+                <div class="space-y-4">
+                    {% for playlist in playlists %}
+                        <div class="bg-surface-1/10 border border-brand/20 rounded-xl p-5 shadow-md hover:shadow-lg transition">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <a href="{% url 'playlist-detail' pk=playlist.pk %}"
+                                       class="text-xl font-medium hover:underline">{{ playlist.title }}</a>
+                                    <p class="text-sm text-muted-foreground">{{ playlist.num_artists }} artist{{ playlist.num_artists|pluralize }}</p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <a href="{% url 'playlist-update' pk=playlist.pk %}"
+                                       class="text-blue-500 hover:underline">Edit</a>
+                                    <a href="{% url 'playlist-delete' pk=playlist.pk %}"
+                                       class="text-red-500 hover:underline">Delete</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p>You have no playlists yet.</p>
-        {% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-center text-muted-foreground">You have no playlists yet.</p>
+            {% endif %}
+        </div>
     </div>
 {% endblock body %}

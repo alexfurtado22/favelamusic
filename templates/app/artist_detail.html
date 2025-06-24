@@ -3,7 +3,7 @@
 {% block body %}
     <div class="grid grid-cols-4 grid-rows-2 max-lg:grid-cols-1 gap-y-6 col-span-2 mx-auto mb-8">
         <!-- Artist Info -->
-        <div class="bg-surface-2 border border-brand/30 rounded-lg shadow-lg overflow-hidden col-span-2 row-span-2 mr-6 max-lg:mr-0">
+        <div class="bg-surface-1/10 border border-brand/20 rounded-lg shadow-lg overflow-hidden col-span-2 row-span-2 mr-6 max-lg:mr-0">
             {% if artist.picture %}
                 <img src="{{ artist.picture.url }}"
                     alt="{{ artist.name }}"
@@ -13,7 +13,7 @@
                 {% endif %}
                 <div class="p-6">
                     <h1 class="text-4xl font-bold">{{ artist.name }}</h1>
-                    <p class="text-md text-gray-600 mt-1">
+                    <p class="text-md text-brand mt-1">
                         by
                         <a href="{% url 'user-profile' username=artist.creator.username %}"
                            class="font-medium text-brand hover:underline">{{ artist.creator.username }}</a>
@@ -23,8 +23,9 @@
                         <div class="mt-3 flex flex-wrap gap-2">
                             {% for playlist in artist.playlists.all %}
                                 <a href="{% url 'playlist-detail' pk=playlist.pk %}"
-                                   class="px-2 py-1 rounded-full text-xs bg-brand/10 text-brand hover:bg-brand/20">
-                                    🎧 {{ playlist.title }}
+                                   class="group flex items-center space-x-2 rounded-full bg-brand/10 px-2 py-1 text-xs text-brand hover:bg-brand/20">
+                                    <span>{% include "svgs/headphone.svg" with class="size-6" %}</span>
+                                    <span>{{ playlist.title }}</span>
                                 </a>
                             {% endfor %}
                         </div>
@@ -64,7 +65,7 @@
                 </div>
             </div>
             <!-- ✅ Add/Remove Playlist -->
-            <div class="bg-surface-2 border border-brand/30 rounded-lg shadow-lg col-span-2">
+            <div class="bg-surface-1/10 border border-brand/20 rounded-lg shadow-lg col-span-2">
                 <div class="p-4 border-b border-brand/30">
                     <h3 class="text-xl text-center font-semibold">Manage Playlists</h3>
                 </div>
@@ -80,13 +81,13 @@
                                         <p class="capitalize font-semibold">{{ playlist.title }}</p>
                                         {% if playlist in artist.playlists.all %}
                                             <button type="submit"
-                                                    class="inline-flex items-center gap-x-2 px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand hover:bg-brand/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand transition duration-300 ease-in-out max-sm:text-xs">
+                                                    class="inline-flex items-center gap-x-2 px-6 py-3  text-sm font-medium rounded-2xl shadow-sm text-white bg-brand/80 hover:bg-brand/30  transition duration-300 ease-in-out max-sm:text-xs">
                                                 {% include "svgs/minus.svg" with class="size-4 mt-1 text-white" %}
                                                 <span>Remove</span>
                                             </button>
                                         {% else %}
                                             <button type="submit"
-                                                    class="inline-flex items-center gap-x-2 px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand hover:bg-brand/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand transition duration-300 ease-in-out max-sm:text-xs">
+                                                    class="inline-flex items-center gap-x-2 px-3 py-1 text-sm font-medium rounded-lg shadow-sm text-white bg-brand/80 hover:bg-brand/30  transition duration-300 ease-in-out max-sm:text-xs">
                                                 {% include "svgs/plus.svg" with class="size-4 mt-1 text-white" %}
                                                 <span>Add</span>
                                             </button>
@@ -110,7 +111,7 @@
                 </div>
             </div>
             <!-- ⭐ Your Rating -->
-            <div class="bg-surface-2 border border-brand/30 rounded-lg shadow-lg col-span-2">
+            <div class="bg-surface-1/10 border border-brand/20 rounded-lg shadow-lg col-span-2">
                 <div class="p-4 border-b border-brand/30">
                     <h3 class="text-xl text-center font-semibold">Your Rating</h3>
                 </div>
@@ -163,7 +164,7 @@
                 </div>
             </div>
             <!-- 📝 All Reviews -->
-            <div class="bg-surface-2 border border-brand/30 rounded-lg shadow-lg col-span-full">
+            <div class="bg-surface-1/10 border border-brand/30 rounded-lg shadow-lg col-span-full">
                 <div class="p-4 border-b border-brand/30">
                     <h3 class="text-xl font-semibold text-center">All User Reviews</h3>
                 </div>

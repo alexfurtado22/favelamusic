@@ -28,7 +28,7 @@
           <!-- Logo -->
           <a href="{% url 'home' %}"
              class="flex items-center gap-2 max-sm:flex-col">
-            {% include "svgs/favelamusic.svg" with class="h-5 w-auto max-lg:hidden" %}
+            {% include "svgs/favelamusic.svg" with class="h-5 w-auto max-xl:hidden" %}
           </a>
           <!-- Desktop Menu -->
           <div class="space-x-4 flex items-center max-md:hidden">
@@ -160,7 +160,7 @@
         </div>
       </header>
       <!-- 🧱 Main content -->
-      <section class="col-span-2 grid grid-cols-1 items-center justify-center px-6 py-8">
+      <section class="col-span-2 grid grid-cols-1 items-center justify-center">
         {% block body %}
         {% endblock body %}
       </section>
@@ -175,7 +175,6 @@
       <script src="{% static 'color_schemes.js' %}"></script>
       <script src="{% static 'svg.js' %}"></script>
       <script src="{% static 'logo.js' %}"></script>
-      <script src="{% static 'minilogo.js' %}"></script>
     {% endblock page_js %}
   </body>
 </html>

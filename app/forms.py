@@ -65,7 +65,9 @@ class RatingForm(forms.ModelForm):
         widgets = {
             "score": forms.RadioSelect(
                 choices=[(i, f"{i} ★") for i in range(1, 6)],
-                attrs={"class": "flex items-center space-x-2"},  # Example for styling
+                attrs={
+                    "class": "inline-flex justify-center item-center gap-4 items-center max-md:flex"
+                },  # Example for styling
             )
         }
 

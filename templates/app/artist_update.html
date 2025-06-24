@@ -2,8 +2,8 @@
 {% load static widget_tweaks %}
 {% block body %}
     <div class="col-span-2">
-        <h1 class="text-2xl">Update Artist</h1>
-        <p>Last edited on {{ artist.updated_at | date:"jS F Y" }}</p>
+        <h1 class="text-lg">Update Artist</h1>
+        <p class="mb-4">Last edited on {{ artist.updated_at | date:"jS F Y" }}</p>
         <form action="{% url 'update_artist' artist.pk %}"
               method="post"
               enctype="multipart/form-data"
@@ -26,111 +26,109 @@
                 {% endif %}
             </fieldset>
             <h2 class="text-center">Upload Media</h2>
-            <div class="grid grid-cols-3 justify-center items-center gap-4 max-md:grid-cols-1  max-xxl:grid-cols-1">
-                <fieldset class="mb-4 space-y-1 text-center flex flex-col items-center border rounded-md p-4">
-                    <label for="{{ form.picture.id_for_label }}"
-                           class="block text-lg font-medium">{{ form.picture.label }}</label>
-                    <label for="{{ form.picture.id_for_label }}"
-                           class="inline-block cursor-pointer bg-brand px-4 text-white py-2 rounded hover:bg-brand/70 transition">
-                        Choose Picture
-                    </label>
-                    {# Render the actual file input as hidden #}
-                    {% render_field form.picture class="hidden" %}
-                    <p id="filename-picture" class="text-sm mt-1">
-                        {# Display current filename if exists, otherwise "No file selected" #}
-                        {% if artist.picture %}
-                            Current: {{ artist.picture.name|truncatechars:30 }}
-                            <a href="{{ artist.picture.url }}"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               class="text-blue-500 hover:underline ml-1">(View)</a>
-                        {% else %}
-                            No file selected
-                        {% endif %}
-                    </p>
-                    {# Add a checkbox for clearing the file, and make sure its name matches Django's expectation #}
+            <fieldset class="mb-4 space-y-1 text-center flex flex-col items-center border border-brand rounded-md p-4">
+                <label for="{{ form.picture.id_for_label }}"
+                       class="block text-lg font-medium">{{ form.picture.label }}</label>
+                <label for="{{ form.picture.id_for_label }}"
+                       class="inline-block cursor-pointer bg-brand px-4 text-white py-2 rounded hover:bg-brand/70 transition">
+                    Choose Picture
+                </label>
+                {# Render the actual file input as hidden #}
+                {% render_field form.picture class="hidden" %}
+                <p id="filename-picture" class="text-sm mt-1">
+                    {# Display current filename if exists, otherwise "No file selected" #}
                     {% if artist.picture %}
-                        <div class="flex items-center mt-2">
-                            <input type="checkbox"
-                                   name="{{ form.picture.html_name }}-clear"
-                                   id="{{ form.picture.id_for_label }}-clear"
-                                   class="mr-2">
-                            <label for="{{ form.picture.id_for_label }}-clear" class="text-sm">Clear current picture</label>
-                        </div>
+                        Current: {{ artist.picture.name|truncatechars:30 }}
+                        <a href="{{ artist.picture.url }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="text-blue-500 hover:underline ml-1">(View)</a>
+                    {% else %}
+                        No file selected
                     {% endif %}
-                    {% if form.picture.errors %}
-                        <ul class="text-red-500 text-sm mt-1">
-                            {% for error in form.picture.errors %}<li>{{ error }}</li>{% endfor %}
-                        </ul>
-                    {% endif %}
-                </fieldset>
-                <fieldset class="mb-4 space-y-1 text-center flex flex-col items-center border rounded-md p-4">
-                    <label for="{{ form.track.id_for_label }}" class="block text-lg font-medium">{{ form.track.label }}</label>
-                    <label for="{{ form.track.id_for_label }}"
-                           class="inline-block cursor-pointer bg-brand px-4 text-white py-2 rounded hover:bg-brand/70 transition">
-                        Choose Track
-                    </label>
-                    {% render_field form.track class="hidden" %}
-                    <p id="filename-track" class="text-sm mt-1">
-                        {% if artist.track %}
-                            Current: {{ artist.track.name|truncatechars:30 }}
-                            <a href="{{ artist.track.url }}"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               class="text-blue-500 hover:underline ml-1">(Play)</a>
-                        {% else %}
-                            No file selected
-                        {% endif %}
-                    </p>
+                </p>
+                {# Add a checkbox for clearing the file, and make sure its name matches Django's expectation #}
+                {% if artist.picture %}
+                    <div class="flex items-center mt-2">
+                        <input type="checkbox"
+                               name="{{ form.picture.html_name }}-clear"
+                               id="{{ form.picture.id_for_label }}-clear"
+                               class="mr-2">
+                        <label for="{{ form.picture.id_for_label }}-clear" class="text-sm">Clear current picture</label>
+                    </div>
+                {% endif %}
+                {% if form.picture.errors %}
+                    <ul class="text-red-500 text-sm mt-1">
+                        {% for error in form.picture.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </fieldset>
+            <fieldset class="mb-4 space-y-1 text-center flex flex-col items-center border border-brand rounded-md p-4">
+                <label for="{{ form.track.id_for_label }}" class="block text-lg font-medium">{{ form.track.label }}</label>
+                <label for="{{ form.track.id_for_label }}"
+                       class="inline-block cursor-pointer bg-brand px-4 text-white py-2 rounded hover:bg-brand/70 transition">
+                    Choose Track
+                </label>
+                {% render_field form.track class="hidden" %}
+                <p id="filename-track" class="text-sm mt-1">
                     {% if artist.track %}
-                        <div class="flex items-center mt-2">
-                            <input type="checkbox"
-                                   name="{{ form.track.html_name }}-clear"
-                                   id="{{ form.track.id_for_label }}-clear"
-                                   class="mr-2">
-                            <label for="{{ form.track.id_for_label }}-clear" class="text-sm">Clear current track</label>
-                        </div>
+                        Current: {{ artist.track.name|truncatechars:30 }}
+                        <a href="{{ artist.track.url }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="text-blue-500 hover:underline ml-1">(Play)</a>
+                    {% else %}
+                        No file selected
                     {% endif %}
-                    {% if form.track.errors %}
-                        <ul class="text-red-500 text-sm mt-1">
-                            {% for error in form.track.errors %}<li>{{ error }}</li>{% endfor %}
-                        </ul>
-                    {% endif %}
-                </fieldset>
-                <fieldset class="mb-4 space-y-1 text-center flex flex-col items-center border rounded-md p-4">
-                    <label for="{{ form.video.id_for_label }}" class="block text-lg font-medium">{{ form.video.label }}</label>
-                    <label for="{{ form.video.id_for_label }}"
-                           class="inline-block cursor-pointer bg-brand px-4 text-white py-2 rounded hover:bg-brand/70 transition">
-                        Choose Video
-                    </label>
-                    {% render_field form.video class="hidden" %}
-                    <p id="filename-video" class="text-sm mt-1">
-                        {% if artist.video %}
-                            Current: {{ artist.video.name|truncatechars:30 }}
-                            <a href="{{ artist.video.url }}"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               class="text-blue-500 hover:underline ml-1">(View)</a>
-                        {% else %}
-                            No file selected
-                        {% endif %}
-                    </p>
+                </p>
+                {% if artist.track %}
+                    <div class="flex items-center mt-2">
+                        <input type="checkbox"
+                               name="{{ form.track.html_name }}-clear"
+                               id="{{ form.track.id_for_label }}-clear"
+                               class="mr-2">
+                        <label for="{{ form.track.id_for_label }}-clear" class="text-sm">Clear current track</label>
+                    </div>
+                {% endif %}
+                {% if form.track.errors %}
+                    <ul class="text-red-500 text-sm mt-1">
+                        {% for error in form.track.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </fieldset>
+            <fieldset class="mb-4 space-y-1 text-center flex flex-col items-center border border-brand rounded-md p-4">
+                <label for="{{ form.video.id_for_label }}" class="block text-lg font-medium">{{ form.video.label }}</label>
+                <label for="{{ form.video.id_for_label }}"
+                       class="inline-block cursor-pointer bg-brand px-4 text-white py-2 rounded hover:bg-brand/70 transition">
+                    Choose Video
+                </label>
+                {% render_field form.video class="hidden" %}
+                <p id="filename-video" class="text-sm mt-1">
                     {% if artist.video %}
-                        <div class="flex items-center mt-2">
-                            <input type="checkbox"
-                                   name="{{ form.video.html_name }}-clear"
-                                   id="{{ form.video.id_for_label }}-clear"
-                                   class="mr-2">
-                            <label for="{{ form.video.id_for_label }}-clear" class="text-sm">Clear current video</label>
-                        </div>
+                        Current: {{ artist.video.name|truncatechars:30 }}
+                        <a href="{{ artist.video.url }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="text-blue-500 hover:underline ml-1">(View)</a>
+                    {% else %}
+                        No file selected
                     {% endif %}
-                    {% if form.video.errors %}
-                        <ul class="text-red-500 text-sm mt-1">
-                            {% for error in form.video.errors %}<li>{{ error }}</li>{% endfor %}
-                        </ul>
-                    {% endif %}
-                </fieldset>
-            </div>
+                </p>
+                {% if artist.video %}
+                    <div class="flex items-center mt-2">
+                        <input type="checkbox"
+                               name="{{ form.video.html_name }}-clear"
+                               id="{{ form.video.id_for_label }}-clear"
+                               class="mr-2">
+                        <label for="{{ form.video.id_for_label }}-clear" class="text-sm">Clear current video</label>
+                    </div>
+                {% endif %}
+                {% if form.video.errors %}
+                    <ul class="text-red-500 text-sm mt-1">
+                        {% for error in form.video.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </fieldset>
             <fieldset class="mb-4 space-y-1">
                 <label for="{{ form.genre.id_for_label }}" class="block">Genre</label>
                 {% render_field form.genre class="input-field" %}
@@ -190,7 +188,5 @@
 {% endblock body %}
 {% block page_js %}
     <script src="{% static 'color_schemes.js' %}"></script>
-    <script src="{% static 'uploader.js' %}"></script>
-    <script src="{% static 'artist_update_media_handler.js' %}"></script>
-    <script src="{% static 'minilogo.js' %}"></script>
+    <script src="{% static 'svg.js' %}"></script>
 {% endblock page_js %}

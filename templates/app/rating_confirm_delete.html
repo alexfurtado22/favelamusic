@@ -1,17 +1,15 @@
 {% extends "base.html" %}
 {% block body %}
-    <div class="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-lg text-center">
-        <h1 class="text-3xl font-bold mb-4 text-gray-800">Confirm Deletion</h1>
-        <p class="text-lg text-gray-700 mb-6">
-            Are you sure you want to delete your rating for the artist "{{ rating.artist.name }}"?
-        </p>
+    <div class="col-span-2 max-w-4xl mx-auto bg-surface-1/80 p-8 rounded-lg border border-brand/20 shadow-lg text-center">
+        <h1 class="text-3xl font-bold mb-4 text-brand">Confirm Deletion</h1>
+        <p class="text-lg mb-6">Are you sure you want to delete your rating for the artist "{{ rating.artist.name }}"?</p>
         <form method="post">
             {% csrf_token %}
             <div class="flex justify-center gap-4">
                 <a href="{% url 'artist-detail' pk=rating.artist.pk %}"
-                   class="px-6 py-2 border rounded-md">Cancel</a>
+                   class="px-6 py-2 bg-brand/80 text-white rounded-lg hover:bg-brand/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand transition duration-300 ease-in-out max-sm:text-xs">Cancel</a>
                 <button type="submit"
-                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">
+                        class="bg-red-600/80 hover:bg-red-600/20 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 transition duration-300 ease-in-out max-sm:text-xs">
                     Yes, Delete
                 </button>
             </div>

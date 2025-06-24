@@ -1,42 +1,52 @@
 {% extends "base.html" %}
+{% load widget_tweaks %}
 {% block body %}
-<div class="max-w-xl mx-auto px-4 py-8">
-  <h1 class="text-3xl font-bold mb-6">
-    {% if form.instance.pk %}Edit Playlist{% else %}Create Playlist{% endif %}
-  </h1>
-
-  <form method="post">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-
-    <div class="mb-4">
-      {{ form.title.label_tag }}
-      {{ form.title }}
-      {{ form.title.errors }}
+  <div class="col-span-2 flex items-center justify-center bg-surface-1/10 backdrop-blur-md">
+    <div class="w-full max-w-lg bg-surface-1/10 border border-brand/20 rounded-2xl shadow-2xl p-8">
+      <h1 class="text-3xl font-semibold mb-8 text-center">
+        {% if form.instance.pk %}
+          Edit Playlist
+        {% else %}
+          Create Playlist
+        {% endif %}
+      </h1>
+      <form method="post" class="space-y-6">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="bg-red-500/10 text-red-500 p-3 rounded-md">
+            {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+          </div>
+        {% endif %}
+        <!-- Title -->
+        <div>
+          {% render_field form.title class="w-full bg-surface-1/10 border border-brand/20 rounded-lg px-4 py-3 placeholder-text-1 focus:ring-2 focus:ring-brand focus:border-brand outline-none" placeholder="Playlist Title" %}
+          {% for error in form.title.errors %}<p class="text-red-500 text-sm mt-2">{{ error }}</p>{% endfor %}
+        </div>
+        <!-- Description -->
+        <div>
+          {% render_field form.description class="w-full bg-surface-1/10 border border-brand/20 rounded-lg px-4 py-3 min-h-[100px] placeholder-text-1 focus:ring-2 focus:ring-brand focus:border-brand outline-none" placeholder="Description (optional)" %}
+          {% for error in form.description.errors %}<p class="text-red-500 text-sm mt-2">{{ error }}</p>{% endfor %}
+        </div>
+        <!-- Checkbox -->
+        <div>
+          <label class="flex items-center gap-3 cursor-pointer">
+            {% render_field form.is_public class+="size-5 text-brand border-brand/20 rounded focus:ring-brand appearance-auto" %}
+            <span class="text-sm text-text-1">Make this playlist public</span>
+          </label>
+          {% for error in form.is_public.errors %}<p class="text-red-500 text-sm mt-2">{{ error }}</p>{% endfor %}
+        </div>
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-4 pt-4">
+          <button type="submit"
+                  class="w-full px-6 py-3 rounded-2xl bg-brand/80 hover:bg-brand/30 text-white font-medium shadow-md transition">
+            Save Playlist
+          </button>
+          <a href="{% url 'playlist-list' %}"
+             class="w-full text-center px-4 py-3 bg-surface-3  font-semibold rounded-lg hover:bg-surface-4 transition">
+            Cancel
+          </a>
+        </div>
+      </form>
     </div>
-
-    <div class="mb-4">
-      {{ form.description.label_tag }}
-      {{ form.description }}
-      {{ form.description.errors }}
-    </div>
-
-    <div class="mb-4">
-      <label class="inline-flex items-center">
-        {{ form.is_public }}
-        <span class="ml-2">Make this playlist public</span>
-      </label>
-      {{ form.is_public.errors }}
-    </div>
-
-    <div class="flex gap-4">
-      <button type="submit" class="px-4 py-2 bg-brand text-white rounded hover:bg-brand/80">
-        Save
-      </button>
-      <a href="{% url 'playlist-list' %}" class="px-4 py-2 bg-surface-3 text-white rounded hover:bg-surface-4">
-        Cancel
-      </a>
-    </div>
-  </form>
-</div>
+  </div>
 {% endblock body %}
