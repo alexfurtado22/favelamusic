@@ -1,10 +1,3 @@
-/**
- * This is a minimal config.
- *
- * If you need the full config, get it from here:
- * https://unpkg.com/browse/tailwindcss@latest/stubs/defaultConfig.stub.js
- */
-
 module.exports = {
   darkMode: ["class"],
   content: [
@@ -54,6 +47,11 @@ module.exports = {
       xxxl: "120rem",
     },
     extend: {
+      fontFamily: {
+        heading: ['"Bebas Neue"', "sans-serif"],
+        graffiti: ['"Permanent Marker"', "cursive"],
+        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"], // your default body font
+      },
       colors: {
         "text-1": "var(--color-text-1)",
         "text-2": "var(--color-text-2)",

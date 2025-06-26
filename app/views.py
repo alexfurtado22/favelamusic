@@ -107,17 +107,48 @@ class ArtistUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return Artist.objects.filter(creator=self.request.user)
 
 
+# app/views.py
+
+
 class ArtistDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Artist
     template_name = "app/artist_delete.html"
     success_url = reverse_lazy("home")
     context_object_name = "artist"
 
-    def test_func(self) -> bool | None:
-        return self.request.user == self.get_object().creator
-
     def get_queryset(self):
-        return Artist.objects.filter(creator=self.request.user)
+        """
+        Filters artists for the current user and uses select_related('creator')
+        to fetch the related User object in the same database query. This
+        avoids the N+1 query problem when creator is accessed later.
+        """
+        return (
+            super()
+            .get_queryset()
+            .select_related("creator")
+            .filter(creator=self.request.user)
+        )
+
+    def get_object(self, queryset=None):
+        """
+        Caches the retrieved object on the view instance (`self.object`)
+        to prevent multiple database lookups.
+
+        The first time this method is called (from test_func), it fetches
+        the object from the database. Subsequent calls will return the cached
+        object directly.
+        """
+        if not hasattr(self, "object"):
+            self.object = super().get_object(queryset)
+        return self.object
+
+    def test_func(self):
+        """
+        This test now uses the efficient get_object method. The first call here
+        fetches and caches the object. The subsequent call within the view's
+        GET or POST handler will use the cache.
+        """
+        return self.request.user == self.get_object().creator
 
 
 class ProducerCreateView(LoginRequiredMixin, CreateView):
@@ -215,15 +246,6 @@ class UserProfileDetailView(DetailView):
             )
         )
         return queryset
-
-
-# app/views.py
-
-
-# app/views.py
-
-
-# app/views.py
 
 
 class ArtistDetailView(DetailView):
@@ -400,18 +422,17 @@ class PlaylistDetailView(LoginRequiredMixin, DetailView):
     template_name = "app/playlist_detail.html"
     context_object_name = "playlist"
 
-    def get_queryset(self):
-        # Select related user (playlist owner)
-        # Prefetch artists, but use select_related on producer to avoid extra queries per artist
-        return Playlist.objects.select_related("user").prefetch_related(
-            # Prefetch artists with annotations and select_related('producer')
-            Prefetch(
-                "artists",
-                queryset=Artist.objects.select_related("producer").annotate(
-                    avg_rating=Avg("ratings__score"), num_ratings=Count("ratings")
-                ),
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = Playlist.objects.select_related("user").prefetch_related(
+                Prefetch(
+                    "artists",
+                    queryset=Artist.objects.select_related("producer").annotate(
+                        avg_rating=Avg("ratings__score"), num_ratings=Count("ratings")
+                    ),
+                )
             )
-        )
+        return queryset.get(pk=self.kwargs["pk"])
 
 
 class PlaylistCreateView(LoginRequiredMixin, CreateView):

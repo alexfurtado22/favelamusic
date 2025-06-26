@@ -17,11 +17,15 @@
                 </div>
             {% endif %}
             <!-- Button -->
-            <div>
+            <div class="flex justify-center gap-4 max-sm:flex-col">
                 <button type="submit"
-                        class="w-full px-6 py-3 rounded-2xl bg-brand/80 hover:bg-brand/30 text-white font-medium shadow-md transition">
+                        class="w-full px-4 py-2 bg-brand/80 rounded-2xl font-medium shadow-md transition hover:bg-brand/30 duration-300 ease-in-out max-sm:text-xs">
                     Save Changes
                 </button>
+                <a href="{% url 'artist-detail' pk=form.instance.artist.pk %}"
+                   class="w-full text-center px-4 py-2 bg-surface-4/80 rounded-2xl font-medium shadow-md transition hover:bg-surface-4/30 duration-300 ease-in-out max-sm:text-xs">
+                    Cancel
+                </a>
             </div>
         </form>
     </div>

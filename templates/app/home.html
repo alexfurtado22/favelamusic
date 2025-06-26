@@ -4,7 +4,7 @@
 {% block body %}
     <div class="col-span-2 text-center">
         {% if user.is_authenticated %}
-            <p class="text-fluid-00 mb-6 text-center flex items-center justify-center gap-2">
+            <p class="text-fluid-00 mb-2 text-center flex items-center justify-center gap-2">
                 You have created
                 <span class="font-semibold mx-1">{{ annotated_user.artist_count_annotated|intcomma }}</span>
                 artist{{ annotated_user.artist_count_annotated|pluralize }}
@@ -18,18 +18,20 @@
                 </svg>
             </p>
         {% endif %}
-        <div class="flex flex-col justify-center items-center text-center my-4 bg-[radial-gradient(var(--color-grid-dot)_1px,transparent_1px)] [background-size:16px_16px]">
+        <div class="flex flex-col justify-center items-center text-center  bg-[radial-gradient(var(--color-grid-dot)_1px,transparent_1px)] [background-size:16px_16px]">
             <img id="logo"
                  src="{% static 'img/girl_white.svg' %}"
                  alt="FavelaMusic Logo"
                  width="auto"
                  height="80"
                  class="h-80 w-auto max-sm:h-60" />
-            <h1 class="text-fluid-4 max-sm:text-fluid-3 font-extrabold tracking-tight mb-4">Welcome to FavelaMusic</h1>
+            <h1 class="text-fluid-6 font-heading max-sm:text-fluid-3 font-extrabold tracking-tight mb-4">
+                Welcome to FavelaMusic
+            </h1>
             <p class="text-lg mb-4">Explore your favorite music themes with dynamic color schemes.</p>
             <a href="{% url 'create_artist' %}"
-               class="inline-flex items-center px-6 py-3 border mb-4 border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand hover:bg-brand/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand transition duration-300 ease-in-out max-sm:text-xs">
-                Create New Artist <span class="ml-2">{% include "svgs/sparkles.svg" with class="size-6" %}</span>
+               class="inline-flex items-center px-6 py-3 border mb-4 border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand hover:bg-brand/70  transition duration-300 ease-in-out max-sm:text-xs">
+                Create New Artist <span class="ml-2">{% include "svgs/sparkles.svg" with class="size-6 animate-pulse" %}</span>
         </a>
     </div>
     {# ARIA: Accessibility role for screen readers #}
@@ -37,12 +39,14 @@
         <a href="{% url 'home' %}"
            class="flex items-center gap-2 max-sm:flex-col">
             {# Tailwind: Sets dimensions, hides this specific logo instance on large screens and down #}
-            {% include "svgs/favelamusic.svg" with class="h-20 w-auto max-md:hidden " %}
+            <div id="logo-wrapper"class="logo-perspective">
+                {% include "svgs/favelamusic.svg" with class="h-20 w-auto max-md:hidden" %}
+            </div>
         </a>
     </div>
-    <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 max-lg:grid-cols-1 mb-6 ">
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 max-lg:grid-cols-1 mb-6">
         {% for artist in artists %}
-            <div class="grid grid-rows-subgrid row-span-8 bg-surface-1/10 border border-brand/20 rounded-md shadow-md justify-center items-center text-center p-4 ">
+            <div class="grid grid-rows-subgrid row-span-8 backdrop-blur-lg bg-surface-1/10 border border-brand/20 rounded-3xl shadow-2xl justify-center items-center text-center p-4 ">
                 <div class="mb-4 flex flex-col items-center text-center">
                     <h2 class="text-xl font-semibold mb-2">
                         {% if user.is_authenticated and artist.creator == user %}
@@ -174,4 +178,25 @@
         {% endfor %}
     </div>
 </div>
+<script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    // Cria a timeline e encadeia as animações diretamente nela.
+    // Isso torna o código mais compacto e legível.
+    gsap.timeline()
+      .from("#logo-wrapper svg", {
+        opacity: 0,
+        y: -600,
+        scale: 0.8,
+        duration: 1.8,
+        ease: "power4.out"
+      })
+      .to("#logo-wrapper svg", {
+        rotationX: 360,
+        duration: 1.5,
+        ease: "power2.inOut",
+        transformOrigin: "50% 50%"
+      });
+  });
+</script>
 {% endblock body %}

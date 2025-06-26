@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
-    <div class="col-span-2 mx-auto">
-        <div class="grid grid-cols-1 justify-center items-center">
+    <div class=" mx-auto grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 max-lg:grid-cols-1">
+        <div class="grid grid-rows-subgrid row-span-5 backdrop-blur-lg bg-surface-1/10 border border-brand/20 rounded-3xl shadow-2xl justify-center items-center text-center p-4">
             <h1 class="text-3xl text-brand font-bold mb-4 text-center">{{ playlist.title }}</h1>
             <p class="mb-4 flex justify-center items-center space-x-2 text-sm max-xs:flex-col">
                 <span>Owned by</span>
@@ -25,7 +25,7 @@
             {% if playlist.artists.all %}
                 <div class="grid grid-cols-1 justify-center items-center gap-4">
                     {% for artist in playlist.artists.all %}
-                        <div class="bg-surface-1/10 border border-brand/30 rounded-lg p-4">
+                        <div class="backdrop-blur-lg bg-surface-1/10 border border-brand/20 rounded-3xl shadow-2xl p-4">
                             <a href="{% url 'artist-detail' pk=artist.pk %}"
                                class="text-lg text-brand font-semibold hover:underline">{{ artist.name }}</a>
                             <p class="text-sm text-muted">Producer: {{ artist.producer.name }}</p>
@@ -39,12 +39,12 @@
             <div class="mt-6 flex gap-4 max-sm:flex-col text-center">
                 {% if request.user == playlist.user %}
                     <a href="{% url 'playlist-update' pk=playlist.pk %}"
-                       class=" px-4 py-2 rounded-2xl bg-brand/80 hover:bg-brand/30 text-white font-medium shadow-md transition">Edit</a>
+                       class="w-full px-4 py-2 rounded-2xl bg-brand/80 hover:bg-brand/30 text-white font-medium shadow-md transition duration-300 ease-in-out max-sm:text-xs">Edit</a>
                     <a href="{% url 'playlist-delete' pk=playlist.pk %}"
-                       class="px-4 py-2 bg-red-500/80 text-white rounded-2xl font-medium shadow-md transition hover:bg-red-500/30">Delete</a>
+                       class="w-full px-4 py-2 bg-red-500/80 text-white rounded-2xl font-medium shadow-md hover:bg-red-500/30 transition duration-300 ease-in-out max-sm:text-xs">Delete</a>
                 {% endif %}
-                <a href="{% url 'playlist-list' %}"
-                   class="px-4 py-2 bg-surface-4/80 rounded-2xl font-medium shadow-md transition hover:bg-surface-4/30">Back to Playlists</a>
+                <a href="{% url 'public-playlist-list' %}"
+                   class=" w-full px-4 py-2 bg-surface-4/80 rounded-2xl font-medium shadow-md transition hover:bg-surface-4/30 duration-300 ease-in-out max-sm:text-xs ">Back to Playlists</a>
             </div>
         </div>
     </div>

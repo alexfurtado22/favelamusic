@@ -3,7 +3,7 @@
 {% block body %}
     <div class="grid grid-cols-4 grid-rows-2 max-lg:grid-cols-1 gap-y-6 col-span-2 mx-auto mb-8">
         <!-- Artist Info -->
-        <div class="bg-surface-1/10 border border-brand/20 rounded-lg shadow-lg overflow-hidden col-span-2 row-span-2 mr-6 max-lg:mr-0">
+        <div class="backdrop-blur-lg bg-surface-1/10 border border-brand/20 rounded-3xl shadow-2xl overflow-hidden col-span-2 row-span-2 mr-6 max-lg:mr-0">
             {% if artist.picture %}
                 <img src="{{ artist.picture.url }}"
                     alt="{{ artist.name }}"
@@ -65,7 +65,7 @@
                 </div>
             </div>
             <!-- ✅ Add/Remove Playlist -->
-            <div class="bg-surface-1/10 border border-brand/20 rounded-lg shadow-lg col-span-2">
+            <div class="backdrop-blur-lg bg-surface-1/10 border border-brand/20 rounded-3xl shadow-2xl col-span-2">
                 <div class="p-4 border-b border-brand/30">
                     <h3 class="text-xl text-center font-semibold">Manage Playlists</h3>
                 </div>
@@ -81,14 +81,14 @@
                                         <p class="capitalize font-semibold">{{ playlist.title }}</p>
                                         {% if playlist in artist.playlists.all %}
                                             <button type="submit"
-                                                    class="inline-flex items-center gap-x-2 px-6 py-3  text-sm font-medium rounded-2xl shadow-sm text-white bg-brand/80 hover:bg-brand/30  transition duration-300 ease-in-out max-sm:text-xs">
-                                                {% include "svgs/minus.svg" with class="size-4 mt-1 text-white" %}
+                                                    class="inline-flex items-center gap-x-2 px-4 py-2  text-sm font-medium rounded-2xl shadow-md text-white bg-brand/80 hover:bg-brand/30  transition duration-300 ease-in-out max-sm:text-xs">
+                                                {% include "svgs/minus.svg" with class="size-4 text-white self-center" %}
                                                 <span>Remove</span>
                                             </button>
                                         {% else %}
                                             <button type="submit"
-                                                    class="inline-flex items-center gap-x-2 px-3 py-1 text-sm font-medium rounded-lg shadow-sm text-white bg-brand/80 hover:bg-brand/30  transition duration-300 ease-in-out max-sm:text-xs">
-                                                {% include "svgs/plus.svg" with class="size-4 mt-1 text-white" %}
+                                                    class="inline-flex items-center gap-x-2 px-4 py-2 text-sm font-medium rounded-2xl shadow-md text-white bg-brand/80 hover:bg-brand/30  transition duration-300 ease-in-out max-sm:text-xs">
+                                                {% include "svgs/plus.svg" with class="size-4 text-white self-center" %}
                                                 <span>Add</span>
                                             </button>
                                         {% endif %}
@@ -111,7 +111,7 @@
                 </div>
             </div>
             <!-- ⭐ Your Rating -->
-            <div class="bg-surface-1/10 border border-brand/20 rounded-lg shadow-lg col-span-2">
+            <div class="backdrop-blur-lg bg-surface-1/10 border border-brand/20 rounded-3xl shadow-2xl col-span-2">
                 <div class="p-4 border-b border-brand/30">
                     <h3 class="text-xl text-center font-semibold">Your Rating</h3>
                 </div>
@@ -164,7 +164,7 @@
                 </div>
             </div>
             <!-- 📝 All Reviews -->
-            <div class="bg-surface-1/10 border border-brand/30 rounded-lg shadow-lg col-span-full">
+            <div class="backdrop-blur-lg bg-surface-1/10 border border-brand/20 rounded-3xl shadow-2xl col-span-full">
                 <div class="p-4 border-b border-brand/30">
                     <h3 class="text-xl font-semibold text-center">All User Reviews</h3>
                 </div>

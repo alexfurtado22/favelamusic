@@ -185,10 +185,16 @@ body {
   background-color: var(--color-surface-1);
   color: var(--color-text-1);
   accent-color: var(--color-brand);
-  font-family: system-ui, sans-serif;
+  font-family: "Inter", system-ui, sans-serif; /* or your chosen font */
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
+}
+
+@theme {
+  --font-heading: "Bebas Neue", sans-serif;
+  --font-graffiti: "Permanent Marker", cursive;
+  --font-sans: "Inter", sans-serif;
 }
 
 @theme {
@@ -317,11 +323,16 @@ body::-webkit-scrollbar-thumb {
 }
 
 input[type="radio"] {
-  @apply bg-surface-1 border-brand focus:ring-brand size-5 cursor-pointer space-x-4 border focus:outline-none focus:ring-2;
+  @apply bg-brand/20 border-brand focus:ring-brand size-5 cursor-pointer space-x-4 border focus:outline-none focus:ring-2;
 }
 
 label {
   @apply cursor-pointer gap-2;
+}
+
+.logo-perspective {
+  @apply [perspective:800px];
+  transform-style: preserve-3d;
 }
 
 @theme {

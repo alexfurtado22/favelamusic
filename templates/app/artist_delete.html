@@ -1,12 +1,21 @@
 {% extends "base.html" %}
 {% load static %}
 {% block body %}
-    <h1>Delete Artist</h1>
-    <p>Are you sure you want to delete the artist "{{ object.name }}"?</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="text-brand hover:text-brand/70 cursor-pointer">Delete</button>
-        <a href="{% url 'home' %}"
-           class="ml-4 underline text-surface-shadow hover:text-surface-shadow/70 cursor-pointer">Cancel</a>
-    </form>
+    <div class="col-span-2 mx-auto max-w-lg w-full backdrop-blur-lg bg-surface-1/10 border border-brand/20 rounded-3xl shadow-2xl p-8">
+        <h1 class="text-2xl font-semibold text-brand mb-4 text-center">Delete Artist</h1>
+        <p class="text-center mb-6">
+            Are you sure you want to delete the artist <strong>"{{ object.name }}"</strong>?
+        </p>
+        <form method="post" class="flex justify-center gap-4 max-sm:flex-col">
+            {% csrf_token %}
+            <button type="submit"
+                    class="w-full px-4 py-2 bg-red-500/80 text-white rounded-2xl font-medium shadow-md hover:bg-red-500/30 transition duration-300 ease-in-out max-sm:text-xs">
+                Delete
+            </button>
+            <a href="{% url 'home' %}"
+               class="w-full px-4 py-2 bg-brand/80 rounded-2xl font-medium shadow-md transition hover:bg-brand/30 duration-300 ease-in-out max-sm:text-xs text-center">
+                Cancel
+            </a>
+        </form>
+    </div>
 {% endblock body %}
