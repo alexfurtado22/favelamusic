@@ -25,10 +25,11 @@
                  width="auto"
                  height="80"
                  class="h-80 w-auto max-sm:h-60" />
-            <h1 class="text-fluid-6 font-heading max-sm:text-fluid-3 font-extrabold tracking-tight mb-4">
+            <h1 id="heading"
+                class="text-fluid-6 font-heading max-sm:text-fluid-3 font-extrabold tracking-tight mb-4 opacity-0">
                 Welcome to FavelaMusic
             </h1>
-            <p class="text-lg mb-4">Explore your favorite music themes with dynamic color schemes.</p>
+            <p class="text-2xl mb-4 font-graffiti">Explore your favorite music themes with dynamic color schemes.</p>
             <a href="{% url 'create_artist' %}"
                class="inline-flex items-center px-6 py-3 border mb-4 border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand hover:bg-brand/70  transition duration-300 ease-in-out max-sm:text-xs">
                 Create New Artist <span class="ml-2">{% include "svgs/sparkles.svg" with class="size-6 animate-pulse" %}</span>
@@ -111,7 +112,7 @@
                     </div>
                 {% endif %}
                 {% if artist.content %}
-                    <div class="my-4 border border-brand rounded-md p-4">
+                    <div class="my-4 border border-brand/20 rounded-md p-4">
                         <p>{{ artist.content }}</p>
                     </div>
                 {% endif %}
@@ -178,25 +179,9 @@
         {% endfor %}
     </div>
 </div>
-<script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
-<script>
-  window.addEventListener("DOMContentLoaded", () => {
-    // Cria a timeline e encadeia as animações diretamente nela.
-    // Isso torna o código mais compacto e legível.
-    gsap.timeline()
-      .from("#logo-wrapper svg", {
-        opacity: 0,
-        y: -600,
-        scale: 0.8,
-        duration: 1.8,
-        ease: "power4.out"
-      })
-      .to("#logo-wrapper svg", {
-        rotationX: 360,
-        duration: 1.5,
-        ease: "power2.inOut",
-        transformOrigin: "50% 50%"
-      });
-  });
-</script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/SplitText.min.js"></script>
 {% endblock body %}
+{% block page_js %}
+    <script src="{% static 'mainAnimations.js' %}"></script>
+{% endblock page_js %}

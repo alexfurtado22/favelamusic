@@ -20,6 +20,8 @@
     {% tailwind_css %}
     <script defer
             src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/SplitText.min.js"></script>
   </head>
   <body data-static-prefix="{% static '' %}">
     <main class="holder grid min-h-dvh grid-cols-2 items-start justify-center">
@@ -35,27 +37,27 @@
           <!-- Desktop Menu -->
           <div class="space-x-4 flex items-center max-md:hidden">
             <a href="{% url 'home' %}"
-               class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'home' %}font-bold{% endif %}">
+               class="text-sm max-xl:text-[0.7rem] border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'home' %}font-bold{% endif %}">
               Home
             </a>
             <a href="{% url 'create_artist' %}"
-               class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'create_artist' %}font-bold{% endif %}">
+               class="text-sm max-xl:text-[0.7rem] border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'create_artist' %}font-bold{% endif %}">
               Create New
             </a>
             <a href="{% url 'playlist-list' %}"
-               class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'playlist-list' %}font-bold{% endif %}">
+               class="text-sm max-xl:text-[0.7rem] border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'playlist-list' %}font-bold{% endif %}">
               My Playlists
             </a>
             <a href="{% url 'public-playlist-list' %}"
-               class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'public-playlist-list' %}font-bold{% endif %}">
+               class="text-sm max-xl:text-[0.7rem] border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'public-playlist-list' %}font-bold{% endif %}">
               Explore Playlists
             </a>
             <a href="{% url 'contact' %}"
-               class="text-sm border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'contact' %}font-bold{% endif %}">
+               class="text-sm max-xl:text-[0.7rem] border-b-2 border-transparent hover:border-brand hover:text-brand transition-all {% if request.resolver_match.url_name == 'contact' %}font-bold{% endif %}">
               Contact Us
             </a>
             {% if user.is_authenticated %}
-              <span class="text-sm text-brand">Hi, {{ user.username }}!</span>
+              <span class="text-sm max-xl:text-[0.7rem] text-brand">Hi, {{ user.username }}!</span>
               <form method="post" action="{% url 'account_logout' %}" class="inline">
                 {% csrf_token %}
                 <button type="submit" class="btn">Logout</button>

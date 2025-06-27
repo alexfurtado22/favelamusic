@@ -74,13 +74,13 @@
     --color-brand: oklch(64.6% 0.222 41.116);
     --color-grid-dot: oklch(0.8549 0.0056 274.95);
     --font-heading: "Bebas Neue", sans-serif;
+    --font-graffiti: "Permanent Marker", cursive;
     --text-fluid-00: clamp(0.5rem, 2vw, 1rem);
     --text-fluid-0: clamp(0.75rem, 2vw, 1rem);
     --text-fluid-1: clamp(1rem, 4vw, 1.5rem);
+    --text-fluid-2: clamp(1.5rem, 6vw, 2.5rem);
     --text-fluid-3: clamp(2rem, 9vw, 3.5rem);
-    --text-fluid-5: clamp(4rem, 5vw, 5rem);
     --text-fluid-6: clamp(5rem, 7vw, 7.5rem);
-    --text-fluid-7: clamp(7.5rem, 10vw, 10rem);
   }
 }
 @layer base {
@@ -591,11 +591,20 @@
   .max-w-4xl {
     max-width: var(--container-4xl);
   }
+  .max-w-dvw {
+    max-width: 100dvw;
+  }
+  .max-w-fit {
+    max-width: fit-content;
+  }
   .max-w-lg {
     max-width: var(--container-lg);
   }
   .max-w-xl {
     max-width: var(--container-xl);
+  }
+  .min-w-\[130px\] {
+    min-width: 130px;
   }
   .-translate-y-4 {
     --tw-translate-y: calc(var(--spacing) * -4);
@@ -658,6 +667,9 @@
   }
   .grid-cols-\[repeat\(auto-fit\,minmax\(200px\,1fr\)\)\] {
     grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+  }
+  .grid-cols-\[repeat\(auto-fit\,minmax\(300px\,1fr\)\)\] {
+    grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
   }
   .grid-rows-2 {
     grid-template-rows: repeat(2, minmax(0, 1fr));
@@ -942,6 +954,9 @@
   .px-2 {
     padding-inline: calc(var(--spacing) * 2);
   }
+  .px-3 {
+    padding-inline: calc(var(--spacing) * 3);
+  }
   .px-4 {
     padding-inline: calc(var(--spacing) * 4);
   }
@@ -980,6 +995,9 @@
   }
   .text-center {
     text-align: center;
+  }
+  .font-graffiti {
+    font-family: var(--font-graffiti);
   }
   .font-heading {
     font-family: var(--font-heading);
@@ -1021,14 +1039,14 @@
   .text-fluid-1 {
     font-size: var(--text-fluid-1);
   }
-  .text-fluid-5 {
-    font-size: var(--text-fluid-5);
+  .text-fluid-2 {
+    font-size: var(--text-fluid-2);
+  }
+  .text-fluid-3 {
+    font-size: var(--text-fluid-3);
   }
   .text-fluid-6 {
     font-size: var(--text-fluid-6);
-  }
-  .text-fluid-7 {
-    font-size: var(--text-fluid-7);
   }
   .leading-relaxed {
     --tw-leading: var(--leading-relaxed);
@@ -1053,6 +1071,9 @@
   .tracking-tight {
     --tw-tracking: var(--tracking-tight);
     letter-spacing: var(--tracking-tight);
+  }
+  .whitespace-nowrap {
+    white-space: nowrap;
   }
   .text-blue-500 {
     color: var(--color-blue-500);
@@ -1378,6 +1399,11 @@
       grid-template-columns: repeat(1, minmax(0, 1fr));
     }
   }
+  .max-xl\:text-\[0\.7rem\] {
+    @media (width < 64rem) {
+      font-size: 0.7rem;
+    }
+  }
   .max-lg\:mr-0 {
     @media (width < 48rem) {
       margin-right: calc(var(--spacing) * 0);
@@ -1408,6 +1434,11 @@
       align-items: center;
     }
   }
+  .max-md\:gap-4 {
+    @media (width < 42rem) {
+      gap: calc(var(--spacing) * 4);
+    }
+  }
   .max-md\:p-4 {
     @media (width < 42rem) {
       padding: calc(var(--spacing) * 4);
@@ -1427,6 +1458,22 @@
     @media (width < 42rem) {
       font-size: var(--text-2xl);
       line-height: var(--tw-leading, var(--text-2xl--line-height));
+    }
+  }
+  .max-md\:text-sm {
+    @media (width < 42rem) {
+      font-size: var(--text-sm);
+      line-height: var(--tw-leading, var(--text-sm--line-height));
+    }
+  }
+  .max-md\:text-fluid-1 {
+    @media (width < 42rem) {
+      font-size: var(--text-fluid-1);
+    }
+  }
+  .max-md\:text-fluid-2 {
+    @media (width < 42rem) {
+      font-size: var(--text-fluid-2);
     }
   }
   .max-sm\:ml-0 {
@@ -1702,7 +1749,10 @@ body::-webkit-scrollbar-thumb {
   border-radius: var(--radius-md);
   border-style: var(--tw-border-style);
   border-width: 1px;
-  border-color: var(--color-brand);
+  border-color: color-mix(in srgb, oklch(64.6% 0.222 41.116) 20%, transparent);
+  @supports (color: color-mix(in lab, red, red)) {
+    border-color: color-mix(in oklab, var(--color-brand) 20%, transparent);
+  }
   background-color: var(--color-surface-1);
   padding: calc(var(--spacing) * 2);
   &:focus {

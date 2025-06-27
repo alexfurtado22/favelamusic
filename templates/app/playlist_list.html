@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load static %}
 {% block body %}
-    <div class="col-span-2 flex items-center justify-center bg-surface-1/10 backdrop-blur-md">
+    <div class="col-span-2 flex items-center justify-center  bg-surface-1/10 backdrop-blur-md">
         <div class="w-full max-w-3xl backdrop-blur-lg bg-surface-1/10 border border-brand/20 rounded-3xl shadow-2xl p-8">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-3xl text-brand font-semibold">Your Playlists</h1>
+            <div class="flex justify-between items-center mb-6 max-md:flex-col max-md:gap-4">
+                <h1 class="split-heading font-graffiti text-fluid-2 max-md:text-fluid-1 text-brand">Explore Playlists</h1>
                 <a href="{% url 'playlist-create' %}"
                    class="inline-flex items-center gap-x-2 px-4 py-2 text-sm font-medium rounded-2xl shadow-md text-white bg-brand/80 hover:bg-brand/30 transition duration-300 ease-in-out max-sm:text-xs">
                     {% include "svgs/plus.svg" with class="size-4 text-white self-center" %}
@@ -44,3 +45,6 @@
         </div>
     </div>
 {% endblock body %}
+{% block page_js %}
+    <script src="{% static 'headingSplit.js' %}"></script>
+{% endblock page_js %}

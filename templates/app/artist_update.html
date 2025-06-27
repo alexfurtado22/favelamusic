@@ -2,7 +2,7 @@
 {% load static widget_tweaks %}
 {% block body %}
     <div class="col-span-2">
-        <h1 class="text-lg">Update Artist</h1>
+        <h1 class="split-heading text-fluid-3 font-graffiti text-center text-brand mb-4">Update Artist</h1>
         <p class="mb-4">Last edited on {{ artist.updated_at | date:"jS F Y" }}</p>
         <form action="{% url 'update_artist' artist.pk %}"
               method="post"
@@ -26,7 +26,7 @@
                 {% endif %}
             </fieldset>
             <h2 class="text-center">Upload Media</h2>
-            <fieldset class="mb-4 space-y-1 text-center flex flex-col items-center border border-brand rounded-md p-4">
+            <fieldset class="mb-4 space-y-1 text-center flex flex-col items-center border border-brand/20 rounded-md p-4">
                 <label for="{{ form.picture.id_for_label }}"
                        class="block text-lg font-medium">{{ form.picture.label }}</label>
                 <label for="{{ form.picture.id_for_label }}"
@@ -63,7 +63,7 @@
                     </ul>
                 {% endif %}
             </fieldset>
-            <fieldset class="mb-4 space-y-1 text-center flex flex-col items-center border border-brand rounded-md p-4">
+            <fieldset class="mb-4 space-y-1 text-center flex flex-col items-center border border-brand/20 rounded-md p-4">
                 <label for="{{ form.track.id_for_label }}" class="block text-lg font-medium">{{ form.track.label }}</label>
                 <label for="{{ form.track.id_for_label }}"
                        class="inline-block cursor-pointer bg-brand px-4 text-white py-2 rounded hover:bg-brand/70 transition">
@@ -96,7 +96,7 @@
                     </ul>
                 {% endif %}
             </fieldset>
-            <fieldset class="mb-4 space-y-1 text-center flex flex-col items-center border border-brand rounded-md p-4">
+            <fieldset class="mb-4 space-y-1 text-center flex flex-col items-center border border-brand/20 rounded-md p-4">
                 <label for="{{ form.video.id_for_label }}" class="block text-lg font-medium">{{ form.video.label }}</label>
                 <label for="{{ form.video.id_for_label }}"
                        class="inline-block cursor-pointer bg-brand px-4 text-white py-2 rounded hover:bg-brand/70 transition">
@@ -189,4 +189,5 @@
 {% block page_js %}
     <script src="{% static 'color_schemes.js' %}"></script>
     <script src="{% static 'svg.js' %}"></script>
+    <script src="{% static 'headingSplit.js' %}"></script>
 {% endblock page_js %}

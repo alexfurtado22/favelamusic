@@ -2,9 +2,11 @@
 {% load static widget_tweaks %}
 {% block body %}
     <div class="col-span-2">
+        <h1 class="split-heading text-fluid-3 max-md:text-fluid-2 text-center font-graffiti text-brand mb-4">
+            Create a New Artist
+        </h1>
         <a href="{% url 'create_producer' %}"
            class="underline text-text-1 hover:text-brand mb-4 inline-block">+ Add producer</a>
-        <h1>Create a New Artist</h1>
         <form x-data="artistCreate()"
               action="{% url 'create_artist' %}"
               method="post"
@@ -18,7 +20,7 @@
                           :class="{ 'text-text-1': (65 - name.length) >= 50, 'text-yellow-500': (65 - name.length) < 50 && (65 - name.length) >= 20, 'text-red-500': (65 - name.length) < 20 }"></span>
                 </div>
             </fieldset>
-            <div class="grid grid-cols-3 justify-center items-center gap-4 max-xl:grid-cols-1 border border-brand rounded-md p-4 ">
+            <div class="grid grid-cols-3 justify-center items-center gap-4 max-xl:grid-cols-1 border border-brand/20 rounded-md p-4 ">
                 <fieldset class="mb-4 space-y-1 text-center">
                     <label for="{{ form.picture.id_for_label }}"
                            class="block text-sm font-medium">{{ form.picture.label }}</label>
@@ -82,4 +84,5 @@
     <script src="{% static 'color_schemes.js' %}"></script>
     <script src="{% static 'index.js' %}"></script>
     <script src="{% static 'svg.js' %}"></script>
+    <script src="{% static 'headingSplit.js' %}"></script>
 {% endblock page_js %}
