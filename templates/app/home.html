@@ -18,7 +18,7 @@
                 </svg>
             </p>
         {% endif %}
-        <div class="flex flex-col justify-center items-center text-center  bg-[radial-gradient(var(--color-grid-dot)_1px,transparent_1px)] [background-size:16px_16px]">
+        <div class="flex flex-col justify-center items-center gap-4 text-center  bg-[radial-gradient(var(--color-grid-dot)_1px,transparent_1px)] [background-size:16px_16px]">
             <img id="logo"
                  src="{% static 'img/girl_white.svg' %}"
                  alt="FavelaMusic Logo"
@@ -26,12 +26,14 @@
                  height="80"
                  class="h-80 w-auto max-sm:h-60" />
             <h1 id="heading"
-                class="text-fluid-6 font-heading max-sm:text-fluid-3 font-extrabold tracking-tight mb-4 opacity-0">
+                class="text-fluid-6 font-heading max-sm:text-fluid-3 max-xs:text-fluid-2 font-extrabold tracking-tight mb-4 opacity-0">
                 Welcome to FavelaMusic
             </h1>
-            <p class="text-2xl mb-4 font-graffiti">Explore your favorite music themes with dynamic color schemes.</p>
+            <div id="logo-wrapper"class="logo-perspective">
+                {% include "svgs/favelamusic.svg" with class="h-20 w-auto max-md:hidden" %}
+            </div>
             <a href="{% url 'create_artist' %}"
-               class="inline-flex items-center px-6 py-3 border mb-4 border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand hover:bg-brand/70  transition duration-300 ease-in-out max-sm:text-xs">
+               class="inline-flex items-center px-6 py-3 border mb-8 border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand hover:bg-brand/70  transition duration-300 ease-in-out max-sm:text-xs">
                 Create New Artist <span class="ml-2">{% include "svgs/sparkles.svg" with class="size-6 animate-pulse" %}</span>
         </a>
     </div>
@@ -40,9 +42,7 @@
         <a href="{% url 'home' %}"
            class="flex items-center gap-2 max-sm:flex-col">
             {# Tailwind: Sets dimensions, hides this specific logo instance on large screens and down #}
-            <div id="logo-wrapper"class="logo-perspective">
-                {% include "svgs/favelamusic.svg" with class="h-20 w-auto max-md:hidden" %}
-            </div>
+            <p class="text-fluid-2 mb-4 font-graffiti">Your music, your mood, your colors.</p>
         </a>
     </div>
     <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 max-lg:grid-cols-1 mb-6">
@@ -184,4 +184,7 @@
 {% endblock body %}
 {% block page_js %}
     <script src="{% static 'mainAnimations.js' %}"></script>
+    <script src="{% static 'color_schemes.js' %}"></script>
+    <script src="{% static 'svg.js' %}"></script>
+    <script src="{% static 'logo.js' %}"></script>
 {% endblock page_js %}

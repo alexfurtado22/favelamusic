@@ -17,6 +17,8 @@
           type="image/svg+xml" />
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Permanent+Marker&display=swap"
           rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     {% tailwind_css %}
     <script defer
             src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -32,7 +34,7 @@
           <!-- Logo -->
           <a href="{% url 'home' %}"
              class="flex items-center gap-2 max-sm:flex-col">
-            {% include "svgs/favelamusic.svg" with class="h-5 w-auto max-xl:hidden" %}
+            {% include "svgs/favelamusic.svg" with class="h-5 w-auto animate-pulse max-xl:hidden" %}
           </a>
           <!-- Desktop Menu -->
           <div class="space-x-4 flex items-center max-md:hidden">
@@ -105,7 +107,9 @@
              class="md:hidden mt-4 flex flex-col space-y-2 bg-surface-2/30 p-4 rounded-lg shadow-lg relative">
           <a href="{% url 'home' %}"
              @click="menuOpen = false"
-             class="flex justify-center mb-4">{% include "svgs/favelamusic.svg" with class="h-10 w-auto" %}</a>
+             class="flex justify-center mb-4">
+            {% include "svgs/favelamusic.svg" with class="h-10 w-auto animate-pulse" %}
+          </a>
           <div class="flex flex-col space-y-4">
             <a href="{% url 'home' %}"
                @click="menuOpen = false"
@@ -153,13 +157,13 @@
           <select id="theme-switcher"
                   aria-label="Select color theme"
                   class="text-xs rounded-full bg-surface-2 focus:outline-none w-fit h-fit focus:ring-0 border border-surface-3">
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-            <option value="lime">Lime</option>
-            <option value="blue">Blue</option>
-            <option value="dim">Dim</option>
-            <option value="grape">Grape</option>
-            <option value="choco">Choco</option>
+            <option value="light">Light ☀️</option>
+            <option value="dark">Dark 🌙</option>
+            <option value="lime">Lime 🌿</option>
+            <option value="blue">Blue 🌊</option>
+            <option value="dim">Dim 🌫️</option>
+            <option value="grape">Grape 🍇</option>
+            <option value="choco">Choco 🍫</option>
           </select>
         </div>
       </header>

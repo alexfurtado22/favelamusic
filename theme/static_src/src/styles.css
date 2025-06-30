@@ -325,6 +325,9 @@ body::-webkit-scrollbar-thumb {
 input[type="radio"] {
   @apply bg-brand/20 border-brand focus:ring-brand size-5 cursor-pointer space-x-4 border focus:outline-none focus:ring-2;
 }
+input[type="checkbox"] {
+  @apply bg-brand/20 border-brand focus:ring-brand ml-2 size-5 cursor-pointer space-x-4 rounded-full border focus:outline-none focus:ring-2;
+}
 
 label {
   @apply cursor-pointer gap-2;

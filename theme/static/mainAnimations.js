@@ -1,26 +1,21 @@
-// mainAnimations.js
-
-// Ensure DOM is loaded
 window.addEventListener("DOMContentLoaded", () => {
   gsap.registerPlugin(SplitText);
 
-  // Wait for fonts to load before splitting
   document.fonts.ready.then(() => {
     const split = SplitText.create("#heading", { type: "chars" });
 
     gsap.set("#heading", { opacity: 1 });
 
-    // Create a single timeline to manage all animations
     const mainTimeline = gsap.timeline();
 
-    // 1. Add the heading animation to the timeline
+    // 1. Animate heading
     mainTimeline.from(split.chars, {
       y: 20,
       autoAlpha: 0,
       stagger: 0.05,
     });
 
-    // 2. Add the logo animation, starting 0.3s after the previous one finishes.
+    // 2. Logo drop-in
     mainTimeline.from(
       "#logo-wrapper svg",
       {
@@ -31,14 +26,38 @@ window.addEventListener("DOMContentLoaded", () => {
         ease: "power4.out",
       },
       "+=0.3",
-    ); // 0.3s delay after heading animation
+    );
 
-    // 3. Chain the next part of the logo animation
+    // 3. Logo spin
     mainTimeline.to("#logo-wrapper svg", {
       rotationX: 360,
       duration: 1.5,
       ease: "power2.inOut",
       transformOrigin: "50% 50%",
+    });
+
+    // Add label after spin ends
+    mainTimeline.add("spinEnd");
+
+    // 4. Dance animation on #logo, starting 0.3s after spin ends
+    mainTimeline.to(
+      "#logo",
+      {
+        x: -60,
+        rotation: -10,
+        scale: 1.4,
+        duration: 1.5,
+        ease: "sine.inOut",
+      },
+      "spinEnd+=0.3",
+    );
+
+    mainTimeline.to("#logo", {
+      x: 0,
+      rotation: 0,
+      scale: 1,
+      duration: 1.5,
+      ease: "sine.inOut",
     });
   });
 });

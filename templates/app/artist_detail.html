@@ -1,17 +1,20 @@
 {% extends "base.html" %}
 {% load humanize %}
+{% load static %}
 {% block body %}
-    <div class="grid grid-cols-4 grid-rows-2 max-lg:grid-cols-1 gap-y-6 col-span-2 mx-auto mb-8">
-        <!-- Artist Info -->
-        <div class="backdrop-blur-lg bg-surface-1/10 border border-brand/20 rounded-3xl shadow-2xl overflow-hidden col-span-2 row-span-2 mr-6 max-lg:mr-0">
-            {% if artist.picture %}
-                <img src="{{ artist.picture.url }}"
-                    alt="{{ artist.name }}"
-                    width="600"  {# Add a representative width #}
-                    height="400" {# Add a representative height with the same aspect ratio #}
-                    class="w-full h-64 object-cover rounded-t-lg" />
+    <div class="col-span-2">
+        <h1 class="split-heading text-fluid-3 font-graffiti text-center text-brand mb-8">Artist Details</h1>
+        <div class="grid grid-cols-4 grid-rows-2 max-lg:grid-cols-1 gap-y-6 col-span-2 mx-auto mb-8">
+            <!-- Artist Info -->
+            <div class="backdrop-blur-lg bg-surface-1/10 border border-brand/20 rounded-3xl shadow-2xl overflow-hidden col-span-2 row-span-2 mr-6 max-lg:mr-0">
+                {% if artist.picture %}
+                    <img src="{{ artist.picture.url }}"
+                         alt="{{ artist.name }}"
+                         width="600"
+                         height="400"
+                         class="max-w-fit h-64 object-cover rounded-t-lg mx-auto" />
                 {% endif %}
-                <div class="p-6">
+                <div class="p-6 flex flex-col justify-center items-center text-center gap-4">
                     <h1 class="text-4xl font-bold">{{ artist.name }}</h1>
                     <p class="text-md text-brand mt-1">
                         by
@@ -31,9 +34,8 @@
                         </div>
                     {% endif %}
                     <!-- ⭐ Average Rating -->
-                    <div class="flex items-center my-4">
-                        <p class="text-2xl font-bold text-yellow-500">{{ artist.avg_rating|floatformat:1|default:"N/A" }}</p>
-                        <div class="flex items-center ml-2">
+                    <div class="flex flex-col items-center mt-4">
+                        <div class="flex space-x-1">
                             {% with rating_rounded=artist.avg_rating|floatformat:0 %}
                                 {% for i in "12345" %}
                                     {% if i <= rating_rounded %}
@@ -48,18 +50,72 @@
                                 {% endfor %}
                             {% endwith %}
                         </div>
-                        <p class="ml-2 text-gray-500">({{ artist.num_ratings }} rating{{ artist.num_ratings|pluralize }})</p>
+                        <p class="text-gray-500 mt-1 text-sm">({{ artist.num_ratings }} rating{{ artist.num_ratings|pluralize }})</p>
                     </div>
                     <!-- 🎧 Content -->
-                    {% if artist.content %}<p class="text-gray-700 leading-relaxed mt-4">{{ artist.content|linebreaks }}</p>{% endif %}
+                    {% if artist.content %}
+                        <div class="border border-brand/20 p-4 rounded-lg mt-4">
+                            <p class="text-gray-700 leading-relaxed">{{ artist.content|linebreaks }}</p>
+                        </div>
+                    {% endif %}
                     <!-- 🔊 Track -->
                     {% if artist.track %}
-                        <div class="mt-6">
-                            <h3 class="text-xl font-semibold mb-2">Listen</h3>
-                            <audio controls class="w-full">
-                                <source src="{{ artist.track.url }}" type="audio/mpeg">
+                        <div class="audio-player bg-surface-2 text-brand rounded-2xl shadow p-4 w-full mt-4">
+                            <h3 class="text-lg font-semibold mb-3 text-brand">Listen</h3>
+                            <audio class="player-audio hidden">
+                                <source src="{{ artist.track.url }}" type="audio/mpeg" />
                                 Your browser does not support the audio element.
                             </audio>
+                            <!-- Controls and Progress -->
+                            <div class="flex flex-col gap-4">
+                                <!-- Controls row -->
+                                <div class="flex items-center justify-between gap-6">
+                                    <!-- ▶️ Play/Pause -->
+                                    <button class="play-pause-btn text-brand/80 hover:text-brand/30 transition"
+                                            aria-label="Toggle Play">
+                                        <svg class="play-icon w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M8 5v14l11-7z" />
+                                        </svg>
+                                        <svg class="pause-icon w-6 h-6 hidden"
+                                             fill="currentColor"
+                                             viewBox="0 0 24 24">
+                                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                                        </svg>
+                                    </button>
+                                    <!-- Volume control -->
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <button class="mute-btn text-brand/80 hover:text-brand/30 transition"
+                                                aria-label="Toggle Mute">
+                                            <svg class="volume-on-icon w-5 h-5"
+                                                 fill="currentColor"
+                                                 viewBox="0 0 24 24">
+                                                <path d="M5 9v6h4l5 5V4l-5 5H5z" />
+                                            </svg>
+                                            <svg class="volume-off-icon w-5 h-5 hidden"
+                                                 fill="currentColor"
+                                                 viewBox="0 0 24 24">
+                                                <path d="M6 9v6h4l5 5V4l-5 5H6z" />
+                                            </svg>
+                                        </button>
+                                        <input class="volume-slider h-1 w-24 accent-brand transition"
+                                               type="range"
+                                               min="0"
+                                               max="1"
+                                               step="0.01"
+                                               value="1" />
+                                    </div>
+                                </div>
+                                <!-- Progress bar -->
+                                <div class="w-full">
+                                    <div class="progress-bar-container bg-brand/80 rounded-full h-1 w-full cursor-pointer">
+                                        <div class="progress bg-gray-800 h-1 rounded-full w-0"></div>
+                                    </div>
+                                    <div class="flex justify-between text-xs text-brand mt-1 max-xs:hidden">
+                                        <span class="current-time">0:00</span>
+                                        <span class="total-duration">0:00</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     {% endif %}
                 </div>
@@ -81,13 +137,13 @@
                                         <p class="capitalize font-semibold">{{ playlist.title }}</p>
                                         {% if playlist in artist.playlists.all %}
                                             <button type="submit"
-                                                    class="inline-flex items-center gap-x-2 px-4 py-2  text-sm font-medium rounded-2xl shadow-md text-white bg-brand/80 hover:bg-brand/30  transition duration-300 ease-in-out max-sm:text-xs">
+                                                    class="inline-flex items-center gap-x-2 px-4 py-2 text-sm font-medium rounded-2xl shadow-md text-white bg-brand/80 hover:bg-brand/30 transition duration-300 ease-in-out max-sm:text-xs">
                                                 {% include "svgs/minus.svg" with class="size-4 text-white self-center" %}
                                                 <span>Remove</span>
                                             </button>
                                         {% else %}
                                             <button type="submit"
-                                                    class="inline-flex items-center gap-x-2 px-4 py-2 text-sm font-medium rounded-2xl shadow-md text-white bg-brand/80 hover:bg-brand/30  transition duration-300 ease-in-out max-sm:text-xs">
+                                                    class="inline-flex items-center gap-x-2 px-4 py-2 text-sm font-medium rounded-2xl shadow-md text-white bg-brand/80 hover:bg-brand/30 transition duration-300 ease-in-out max-sm:text-xs">
                                                 {% include "svgs/plus.svg" with class="size-4 text-white self-center" %}
                                                 <span>Add</span>
                                             </button>
@@ -199,8 +255,13 @@
                 </div>
             </div>
         </div>
-        <!-- ⬅️ Back to Home -->
-        <div class="col-span-4 flex justify-center">
-            <a href="{% url 'home' %}" class="btn max-sm:w-full text-center">⬅ Back to Home</a>
-        </div>
-    {% endblock body %}
+        <!-- CLOSE: grid -->
+    </div>
+    <!-- CLOSE: col-span-2 -->
+{% endblock body %}
+{% block page_js %}
+    <script src="{% static 'color_schemes.js' %}"></script>
+    <script src="{% static 'svg.js' %}"></script>
+    <script src="{% static 'headingSplit.js' %}"></script>
+    <script src="{% static 'audioPlayer.js' %}"></script>
+{% endblock page_js %}

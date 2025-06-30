@@ -99,12 +99,18 @@ class ArtistUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     success_url = reverse_lazy("home")
     context_object_name = "artist"
 
-    def test_func(self) -> bool | None:
-        return self.request.user == self.get_object().creator
-
     def get_queryset(self):
-        # Only allow updating artists created by the logged-in user
-        return Artist.objects.filter(creator=self.request.user)
+        return Artist.objects.filter(creator=self.request.user).select_related(
+            "creator", "producer"
+        )
+
+    def get_object(self, queryset=None):
+        if not hasattr(self, "_cached_object"):
+            self._cached_object = super().get_object(queryset)
+        return self._cached_object
+
+    def test_func(self):
+        return self.request.user == self.get_object().creator
 
 
 # app/views.py

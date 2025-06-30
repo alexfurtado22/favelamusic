@@ -2,7 +2,9 @@
 {% load static widget_tweaks %}
 {% block body %}
     <div class="col-span-2">
-        <h1>Create a New Producer</h1>
+        <h1 class="split-heading font-graffiti text-fluid-2 max-md:text-fluid-1 text-brand text-center mb-4">
+            Create a New Producer
+        </h1>
         <form x-data="producerCreate()"
               action="{% url 'create_producer' %}"
               method="post"
@@ -46,4 +48,5 @@
 {% block page_js %}
     <script src="{% static 'color_schemes.js' %}"></script>
     <script src="{% static 'index.js' %}"></script>
+    <script src="{% static 'headingSplit.js' %}"></script>
 {% endblock page_js %}

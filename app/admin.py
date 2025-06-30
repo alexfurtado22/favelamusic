@@ -89,7 +89,28 @@ class ArtistAdmin(admin.ModelAdmin):
         "video_preview",
     )
 
-    # Methods for previewing media (as before)
+    # 👇 Control the field order in the form
+    fields = (
+        "name",
+        "picture",
+        "track",
+        "video",
+        # now comes after video
+        "genre",
+        "producer",
+        "content",
+        "instagram",
+        "youtube_link",
+        "twitter",
+        "creator",
+        "created_at",
+        "updated_at",
+        "picture_preview",
+        "track_preview",
+        "video_preview",
+    )
+
+    # Media preview methods
     def picture_preview(self, obj):
         if obj.picture:
             return format_html(
