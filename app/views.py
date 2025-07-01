@@ -55,7 +55,9 @@ class ArtistListView(ListView):
             # ...and add the result to the template data.
             context["annotated_user"] = user_with_count
 
-        # Return all the data to the template
+            # Return all the data to the template
+            context["range_100"] = range(1, 101)
+
         return context
 
 

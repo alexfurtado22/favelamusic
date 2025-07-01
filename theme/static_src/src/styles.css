@@ -338,6 +338,61 @@ label {
   transform-style: preserve-3d;
 }
 
+.loader {
+  position: relative;
+  top: -50px;
+
+  --from: 80px;
+  --to: 400px;
+  --size: 32px;
+  --time: 7s;
+  --count: 100;
+  --turns: 6;
+}
+
+.circle {
+  position: absolute;
+  --delay: calc(var(--time) / var(--count) * -1 * var(--i));
+  rotate: calc(var(--turns) * 1turn / var(--count) * var(--i));
+  animation: circle var(--time) var(--delay) ease-in-out infinite;
+}
+
+.circle::before {
+  content: "";
+  display: block;
+  width: var(--size);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  transform-origin: center center;
+  animation: circleSize var(--time) var(--delay) ease-in-out infinite;
+}
+
+.rainbow .circle::before {
+  background-color: hsl(
+    calc(1turn / (var(--count) / var(--turns)) * var(--i)) 100% 70%
+  );
+}
+
+@keyframes circle {
+  from {
+    transform: translate(0, var(--from));
+  }
+  to {
+    transform: translate(0, var(--to));
+  }
+}
+
+@keyframes circleSize {
+  0%,
+  100% {
+    transform: scale(0);
+  }
+  25%,
+  50% {
+    transform: scale(1);
+  }
+}
+
 @theme {
   --breakpoint-xxs: 15rem; /* 240px */
   --breakpoint-xs: 24rem; /* 384px */
