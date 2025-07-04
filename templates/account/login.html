@@ -3,16 +3,17 @@
 {% load allauth account %}
 {% load static %}
 {% block body %}
-    <!-- Decorative floating blob -->
+    <!-- 🔵 Background decorative blobs -->
     <div class="absolute inset-0 -z-10 overflow-hidden">
-        <div class="absolute top-1/4 left-1/2 h-72 w-72 max-sm:h-30 max-sm:w-30 bg-brand opacity-30 rounded-full blur-3xl animate-[float]">
+        <div class="absolute top-1/4 left-1/2 h-72 w-72 max-sm:h-30 max-sm:w-30 bg-brand opacity-30 rounded-full blur-3xl animate-pulse">
         </div>
-        <div class="absolute bottom-8 right-8 h-48 w-48 max-sm:h-30 max-sm:w-30  bg-brand opacity-20 rounded-full blur-3xl animate-[float]">
+        <div class="absolute bottom-8 right-8 h-48 w-48 max-sm:h-30 max-sm:w-30 bg-brand opacity-20 rounded-full blur-3xl animate-pulse">
         </div>
     </div>
-    <div class="min-h-screen flex items-center justify-center ">
-        <div class="relative w-full backdrop-blur-lg bg-surface-1/10 border border-brand/20 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
-            <!-- Left pane -->
+    <!-- 🔵 Main container: centers the login panel -->
+    <div class="flex items-center justify-center">
+        <div class="relative w-full backdrop-blur-lg border border-brand/20 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+            <!-- 🔵 Left side: motivational message and logo -->
             <div class="max-md:hidden flex w-1/2 bg-gradient-to-br from-brand/40 via-brand/30 to-transparent items-center justify-center p-10">
                 <div class="max-w-xs flex flex-col items-center text-center">
                     <img id="logo"
@@ -21,56 +22,99 @@
                          width="auto"
                          height="80"
                          class="h-80 w-auto max-sm:h-60 mb-6" />
-                    <h2 class="text-3xl tracking-tight font-semibold leading-snug">Join the next wave</h2>
-                    <p class="mt-4 text-sm">
-                        Access powerful dashboards, real-time insights, and a community of creators pushing the web forward.
-                    </p>
+                    <h2 class="text-3xl tracking-tight font-semibold leading-snug">Join the FavelaMusic Movement</h2>
+                    <p class="mt-4 text-sm">No Labels, No Limits, Just Vibes. From Local to Global. We Amplify the Underground.</p>
                 </div>
             </div>
-            <!-- Right pane -->
+            <!-- 🔵 Right side: form and heading -->
             <div class="max-md:w-full w-1/2 p-8 sm:p-10">
-                <!-- Brand -->
-                <div class="flex items-center mb-8">{% include "svgs/favelamusic.svg" with class="h-20 w-auto " %}</div>
+                <!-- FavelaMusic logo SVG -->
+                <div class="flex justify-center items-center mb-8">{% include "svgs/favelamusic.svg" with class="h-20 w-auto" %}</div>
                 <!-- Heading -->
-                <h1 class="text-2xl tracking-tight font-semibold">Sign in to your account</h1>
-                <p class="text-gray-400 text-sm mt-1 mb-8">Welcome back. We missed you!</p>
-                <!-- Login Form -->
+                <h1 class="text-2xl tracking-tight font-semibold max-sm:text-sm">Sign in to your account</h1>
+                <p class="text-brand/30 text-sm mt-1 mb-8">Welcome back. We missed you!</p>
+                <!-- 🔵 Login Form -->
                 <form method="post" action="{% url 'account_login' %}" class="space-y-6">
                     {% csrf_token %}
-                    {% for field in form %}
-                        <div>
-                            <label for="{{ field.id_for_label }}" class="block text-sm mb-2">{{ field.label }}</label>
-                            {% render_field field class="input-field placeholder-text-1" %}
-                            {% if field.errors %}<p class="text-red-500 text-sm mt-1">{{ field.errors|join:", " }}</p>{% endif %}
+                    {# 🔴 Non-field errors like "invalid login" #}
+                    {% if form.non_field_errors %}
+                        <div class="flex items-start gap-2 text-red-500 text-sm mb-4">
+                            <svg class="h-4 w-4 mt-0.5 shrink-0"
+                                 fill="currentColor"
+                                 viewBox="0 0 20 20"
+                                 aria-hidden="true">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                            <span>{{ form.non_field_errors|join:", " }}</span>
                         </div>
-                    {% endfor %}
-                    {% if redirect_field_value %}
-                        <input type="hidden"
-                               name="{{ redirect_field_name }}"
-                               value="{{ redirect_field_value }}" />
                     {% endif %}
-                    <div class="flex items-center justify-between">
-                        <label class="flex items-center text-sm text-gray-400">
-                            <input type="checkbox"
-                                   name="remember"
-                                   class="mr-2 h-4 w-4 rounded border-gray-700 bg-gray-800 checked:bg-indigo-600 checked:border-indigo-600 focus:ring-0">
-                            Remember me
-                        </label>
-                        <a href="{% url 'account_reset_password' %}"
-                           class="text-sm text-indigo-400 hover:text-indigo-300 transition">Forgot password?</a>
-                    </div>
-                    <button type="submit"
-                            class="w-full bg-indigo-600 hover:bg-indigo-700 transition text-white font-medium py-3 rounded-lg">
-                        Sign In
-                    </button>
+                    {# 🔁 Loop over each field: login, password, remember #}
+                    {% for field in form %}
+                        {% if field.name == "remember" %}
+                            <!-- 🟡 "Remember me" checkbox and "Forgot password" link -->
+                            <div class="flex items-center justify-between">
+                                <label class="flex items-center text-sm text-brand/80 gap-2">
+                                    {% render_field field class="h-4 w-4 bg-brand/20 border-brand focus:ring-brand ml-2 size-5 cursor-pointer space-x-4 rounded-full border focus:outline-none focus:ring-2;" %}
+                                    {{ field.label }}
+                                </label>
+                                <a href="{% url 'account_reset_password' %}"
+                                   class="text-sm text-brand/80 hover:text-brand/30 transition">Forgot password?</a>
+                            </div>
+                        {% elif field.name == "password" %}
+                            <!-- 🟡 Password field with toggle visibility -->
+                            <div>
+                                <label for="{{ field.id_for_label }}" class="block text-sm mb-2 sr-only">{{ field.label }}</label>
+                                <div class="relative">
+                                    {% render_field field class="input-field pr-12 placeholder-text-1/30" %}
+                                    <button type="button"
+                                            id="toggle-password-btn"
+                                            class="absolute top-1/2 right-4 -translate-y-1/2 text-brand/50 hover:text-brand/80"
+                                            onclick="togglePasswordVisibility()"
+                                            tabindex="-1"
+                                            aria-label="Toggle password visibility">
+                                        <span id="eye-open" class="block">{% include "svgs/eye-closed.svg" with class="w-5 h-5" %}</span>
+                                        <span id="eye-closed" class="hidden">{% include "svgs/eye.svg" with class="w-5 h-5" %}</span>
+                                    </button>
+                                </div>
+                                {% if field.errors %}<p class="text-red-500 text-sm mt-1">{{ field.errors|join:", " }}</p>{% endif %}
+                            </div>
+                        {% else %}
+                            <!-- 🟢 Default rendering for the login field -->
+                            <div>
+                                <label for="{{ field.id_for_label }}" class="block text-sm mb-2 sr-only">{{ field.label }}</label>
+                                {% render_field field class="input-field placeholder-text-1/30" %}
+                                {% if field.errors %}<p class="text-red-500 text-sm mt-1">{{ field.errors|join:", " }}</p>{% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    <!-- Submit button -->
+                    <button type="submit" class="w-full btn">Sign In</button>
                 </form>
-                <!-- Footer -->
-                <p class="text-xs text-gray-500 mt-8 text-center">
+                <!-- 🔵 Sign up link -->
+                <p class="text-xs text-text-1 mt-8 text-center">
                     No account yet?
-                    <a href="{% url 'account_signup' %}"
-                       class="text-indigo-400 hover:text-indigo-300 transition">Create one</a>
+                    <a href="{{ signup_url }}"
+                       class="text-brand/80 hover:text-brand/30 transition">Create one</a>
                 </p>
             </div>
         </div>
     </div>
+    <!-- 🛠 Password toggle logic -->
+    <script>
+    function togglePasswordVisibility() {
+      const input = document.querySelector('input[name="password"]')
+      const eyeOpen = document.getElementById('eye-open')
+      const eyeClosed = document.getElementById('eye-closed')
+
+      if (input.type === 'password') {
+        input.type = 'text'
+        eyeOpen.classList.add('hidden')
+        eyeClosed.classList.remove('hidden')
+      } else {
+        input.type = 'password'
+        eyeOpen.classList.remove('hidden')
+        eyeClosed.classList.add('hidden')
+      }
+    }
+    </script>
 {% endblock body %}

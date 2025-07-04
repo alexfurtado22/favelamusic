@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.mail import send_mail
 from django.db import IntegrityError  # <-- Add this import
 from django.db.models import Avg, Count, Prefetch
@@ -30,38 +31,31 @@ class ArtistListView(ListView):
     context_object_name = "artists"
 
     def get_queryset(self):
-        # This part is already correct and efficient.
         queryset = (
             super()
             .get_queryset()
             .select_related("creator", "producer", "producer__creator")
             .annotate(avg_rating=Avg("ratings__score"), num_ratings=Count("ratings"))
+            .order_by("-avg_rating", "-num_ratings")
         )
-        queryset = queryset.order_by("-avg_rating", "-num_ratings")
         return queryset
 
-    # --- ADD THIS ENTIRE METHOD TO THE CLASS ---
     def get_context_data(self, **kwargs):
-        # Get the default data
         context = super().get_context_data(**kwargs)
 
-        # If a user is logged in...
+        # Provide range_100 to all templates (login or not)
+        context["range_100"] = range(1, 101)
+
         if self.request.user.is_authenticated:
-            # ...run one single, efficient query to get their artist count...
             user_with_count = UserProfile.objects.annotate(
                 artist_count_annotated=Count("artists")
             ).get(pk=self.request.user.pk)
-
-            # ...and add the result to the template data.
             context["annotated_user"] = user_with_count
-
-            # Return all the data to the template
-            context["range_100"] = range(1, 101)
 
         return context
 
 
-class ArtistCreateView(LoginRequiredMixin, CreateView):
+class ArtistCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Artist
     template_name = "app/artist_create.html"
     fields = [
@@ -77,13 +71,16 @@ class ArtistCreateView(LoginRequiredMixin, CreateView):
         "youtube_link",
     ]
     success_url = reverse_lazy("home")
+    success_message = "Artist '%(name)s' created successfully!"
 
     def form_valid(self, form):
-        form.instance.creator = self.request.user  # ✅ Correct placement
+        form.instance.creator = self.request.user
         return super().form_valid(form)
 
 
-class ArtistUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class ArtistUpdateView(
+    LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView
+):
     model = Artist
     template_name = "app/artist_update.html"
     fields = [
@@ -100,6 +97,7 @@ class ArtistUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     ]
     success_url = reverse_lazy("home")
     context_object_name = "artist"
+    success_message = "Artist '%(name)s' updated successfully!"
 
     def get_queryset(self):
         return Artist.objects.filter(creator=self.request.user).select_related(
@@ -118,10 +116,13 @@ class ArtistUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 # app/views.py
 
 
-class ArtistDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class ArtistDeleteView(
+    LoginRequiredMixin, UserPassesTestMixin, DeleteView, SuccessMessageMixin
+):
     model = Artist
     template_name = "app/artist_delete.html"
     success_url = reverse_lazy("home")
+    success_message = "Artist '%(name)s' deleted successfully!"
     context_object_name = "artist"
 
     def get_queryset(self):
@@ -159,7 +160,7 @@ class ArtistDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return self.request.user == self.get_object().creator
 
 
-class ProducerCreateView(LoginRequiredMixin, CreateView):
+class ProducerCreateView(LoginRequiredMixin, CreateView, SuccessMessageMixin):
     model = Producer  # ✅ Fixed from Artist
     template_name = "app/producer_create.html"
     fields = [
@@ -169,6 +170,7 @@ class ProducerCreateView(LoginRequiredMixin, CreateView):
         "website",
     ]
     success_url = reverse_lazy("home")
+    success_message = "Producer '%(name)s' created successfully!"
 
     def form_valid(self, form):
         form.instance.creator = self.request.user  # ✅ UserProfile is the user model

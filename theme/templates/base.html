@@ -169,12 +169,104 @@
       </header>
       <!-- 🧱 Main content -->
       <section class="col-span-2 grid grid-cols-1 items-center justify-center">
+        {% if messages %}
+          <div class="w-full flex justify-center items-center mt-4 px-4">
+            <div class="space-y-2 w-full max-w-md mb-8">
+              {% for message in messages %}
+                <div x-data="{ show: true, getMessageClass() { const tag = '{{ message.tags }}'; const baseClasses = 'p-4 rounded-md border text-center text-sm font-medium text-gray-800'; const colorClasses = { success: 'bg-green-200 border-green-400', error: 'bg-red-200 border-red-400', warning: 'bg-yellow-200 border-yellow-400', info: 'bg-blue-200 border-blue-400' }; return baseClasses + ' ' + (colorClasses[tag] || 'bg-gray-200 border-gray-400'); } }"
+                     x-init=" setTimeout(() => show = false, 5000); gsap.from($el, { opacity: 0, y: -10, duration: 0.4, ease: 'power2.out' }); "
+                     x-show="show"
+                     x-cloak
+                     @after-leave="gsap.to($el, { opacity: 0, y: 10, duration: 0.4, onComplete: () => $el.remove() })"
+                     :class="getMessageClass()">
+                  <div class="flex justify-between items-center">
+                    <span class="w-full text-center">{{ message }}</span>
+                    <button @click="show = false" class="ml-4 text-gray-600 hover:text-gray-900">×</button>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
         {% block body %}
         {% endblock body %}
       </section>
       <!-- 👣 Footer -->
-      <footer class="col-span-2 mt-10 py-4 text-center text-sm">
-        © {{ now|date:"Y" }} FavelaMusic. No rights reserved.
+      <footer class="col-span-2 mt-16 px-4 py-10 text-center text-sm bg-surface-1 border-t border-brand/20">
+        <div class="max-w-screen-xl mx-auto space-y-8">
+          <!-- Navigation -->
+          <nav aria-label="Footer Navigation">
+            <div class="flex flex-wrap justify-center gap-4 text-sm">
+              <a href="{% url 'home' %}"
+                 class="hover:text-brand transition-colors {% if request.resolver_match.url_name == 'home' %}font-bold text-brand{% endif %}">
+                Home
+              </a>
+              <a href="{% url 'create_artist' %}"
+                 class="hover:text-brand transition-colors {% if request.resolver_match.url_name == 'create_artist' %}font-bold text-brand{% endif %}">
+                Create New
+              </a>
+              <a href="{% url 'playlist-list' %}"
+                 class="hover:text-brand transition-colors {% if request.resolver_match.url_name == 'playlist-list' %}font-bold text-brand{% endif %}">
+                My Playlists
+              </a>
+              <a href="{% url 'public-playlist-list' %}"
+                 class="hover:text-brand transition-colors {% if request.resolver_match.url_name == 'public-playlist-list' %}font-bold text-brand{% endif %}">
+                Explore Playlists
+              </a>
+              <a href="{% url 'contact' %}"
+                 class="hover:text-brand transition-colors {% if request.resolver_match.url_name == 'contact' %}font-bold text-brand{% endif %}">
+                Contact Us
+              </a>
+            </div>
+          </nav>
+          <!-- Social Icons -->
+          <div class="flex justify-center gap-6">
+            <a href="#"
+               aria-label="Twitter Profile"
+               title="Twitter"
+               class="hover:text-brand transition-transform hover:scale-110">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 50 50"
+                width="20px"
+                height="20px"
+                fill="currentColor"
+                aria-hidden="true" {# Good for accessibility #}
+                >
+                <path d="M 5.9199219 6 L 20.582031 27.375 L 6.2304688 44 L 9.4101562 44 L 21.986328 29.421875 L 31.986328 44 L 44 44 L 28.681641 21.669922 L 42.199219 6 L 39.029297 6 L 27.275391 19.617188 L 17.933594 6 L 5.9199219 6 z M 9.7167969 8 L 16.880859 8 L 40.203125 42 L 33.039062 42 L 9.7167969 8 z" />
+              </svg>
+            </a>
+            <a href="#"
+               aria-label="Instagram Profile"
+               title="Instagram"
+               class="hover:text-brand transition-transform hover:scale-110">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 50 50"
+                width="20px"
+                height="20px"
+                fill="currentColor"
+                aria-hidden="true" {# Good for accessibility #}
+                >
+                <path d="M 16 3 C 8.8324839 3 3 8.8324839 3 16 L 3 34 C 3 41.167516 8.8324839 47 16 47 L 34 47 C 41.167516 47 47 41.167516 47 34 L 47 16 C 47 8.8324839 41.167516 3 34 3 L 16 3 z M 16 5 L 34 5 C 40.086484 5 45 9.9135161 45 16 L 45 34 C 45 40.086484 40.086484 45 34 45 L 16 45 C 9.9135161 45 5 40.086484 5 34 L 5 16 C 5 9.9135161 9.9135161 5 16 5 z M 37 11 A 2 2 0 0 0 35 13 A 2 2 0 0 0 37 15 A 2 2 0 0 0 39 13 A 2 2 0 0 0 37 11 z M 25 14 C 18.936712 14 14 18.936712 14 25 C 14 31.063288 18.936712 36 25 36 C 31.063288 36 36 31.063288 36 25 C 36 18.936712 31.063288 14 25 14 z M 25 16 C 29.982407 16 34 20.017593 34 25 C 34 29.982407 29.982407 34 25 34 C 20.017593 34 16 29.982407 16 25 C 16 20.017593 20.017593 16 25 16 z" />
+              </svg>
+            </a>
+            <a href="#"
+               aria-label="Youtube Profile"
+               title="LinkedIn"
+               class="hover:text-brand transition-transform hover:scale-110">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 50 50"
+                width="20px"
+                height="20px"
+                fill="currentColor"
+                aria-hidden="true" {# Good for accessibility #}
+                >
+                <path d="M 24.402344 9 C 17.800781 9 11.601563 9.5 8.300781 10.199219 C 6.101563 10.699219 4.199219 12.199219 3.800781 14.5 C 3.402344 16.898438 3 20.5 3 25 C 3 29.5 3.398438 33 3.898438 35.5 C 4.300781 37.699219 6.199219 39.300781 8.398438 39.800781 C 11.902344 40.5 17.898438 41 24.5 41 C 31.101563 41 37.097656 40.5 40.597656 39.800781 C 42.800781 39.300781 44.699219 37.800781 45.097656 35.5 C 45.5 33 46 29.402344 46.097656 24.902344 C 46.097656 20.402344 45.597656 16.800781 45.097656 14.300781 C 44.699219 12.101563 42.800781 10.5 40.597656 10 C 37.097656 9.5 31 9 24.402344 9 Z M 24.402344 11 C 31.601563 11 37.398438 11.597656 40.199219 12.097656 C 41.699219 12.5 42.898438 13.5 43.097656 14.800781 C 43.699219 18 44.097656 21.402344 44.097656 24.902344 C 44 29.199219 43.5 32.699219 43.097656 35.199219 C 42.800781 37.097656 40.800781 37.699219 40.199219 37.902344 C 36.597656 38.601563 30.597656 39.097656 24.597656 39.097656 C 18.597656 39.097656 12.5 38.699219 9 37.902344 C 7.5 37.5 6.300781 36.5 6.101563 35.199219 C 5.300781 32.398438 5 28.699219 5 25 C 5 20.398438 5.402344 17 5.800781 14.902344 C 6.101563 13 8.199219 12.398438 8.699219 12.199219 C 12 11.5 18.101563 11 24.402344 11 Z M 19 17 L 19 33 L 33 25 Z M 21 20.402344 L 29 25 L 21 29.597656 Z" />
+              </svg>
+            </a>
+          </div>
+          <!-- Footer Note -->
+          <p class="text-xs text-muted-foreground">© {% now "Y" %} FavelaMusic. No rights reserved.</p>
+        </div>
       </footer>
     </main>
     {% block extra_body %}
@@ -183,6 +275,7 @@
       <script src="{% static 'color_schemes.js' %}"></script>
       <script src="{% static 'svg.js' %}"></script>
       <script src="{% static 'logo.js' %}"></script>
+      <script src="{% static 'flash.js' %}" defer></script>
     {% endblock page_js %}
   </body>
 </html>
