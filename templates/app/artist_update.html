@@ -296,14 +296,60 @@
             <div class="flex justify-between items-center space-x-4 max-sm:flex-col max-sm:space-x-0 max-sm:space-y-6 mt-6">
                 <button type="submit" class="btn">Update Artist</button>
                 <a href="{% url 'home' %}"
-                   class="ml-auto text-brand/80 hover:text-brand/30 max-sm:ml-0 underline transition duration-300 ease-in-out max-sm:text-xs">Back to list</a>
-                <a href="{% url 'delete_artist' artist.pk %}"
-                   class="ml-auto text-red-500/80 hover:text-red-500/30 underline max-sm:ml-0 transition duration-300 ease-in-out max-sm:text-xs">Delete Artist</a>
+                   class="ml-auto text-brand/80 hover:text-brand/30 max-sm:ml-0 underline transition duration-300 ease-in-out max-sm:text-xs">
+                    Back to list
+                </a>
+                <a hx-get="{% url 'delete_artist' artist.pk %}"
+                   hx-target="#dialog"
+                   hx-select="section"
+                   hx-indicator=".htmx-indicator"
+                   class="ml-auto text-red-500/80 hover:text-red-500/30 underline max-sm:ml-0 transition duration-300 ease-in-out max-sm:text-xs">
+                    Delete Artist
+                </a>
             </div>
         </form>
     </div>
 {% endblock body %}
+{% block extra_body %}
+    <!-- HTMX Spinner Indicator -->
+    <div class="htmx-indicator fixed top-4 left-1/2 transform -translate-x-1/2 w-6 h-6 border-4 border-t-brand/80 border-surface rounded-full animate-spin z-50 hidden">
+    </div>
+    <!-- Modal Dialog -->
+    <div id="model"
+         class="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm hidden"
+         onclick="document.getElementById('model').classList.add('hidden')">
+        <div class="fixed inset-0 z-50 p-4 flex items-center justify-center"
+             onclick="event.stopPropagation()">
+            <div id="dialog"
+                 class="bg-surface-1 p-16 rounded-md shadow-lg w-full max-w-md"></div>
+        </div>
+    </div>
+{% endblock extra_body %}
 {% block page_js %}
+    <script type="application/javascript">
+  const model = document.getElementById("model")
+
+  // Show modal on successful content swap
+  htmx.on("htmx:afterSwap", function (e) {
+    if (e.detail.target.id === "dialog") {
+      model.classList.remove("hidden")
+    }
+  })
+
+  // Close modal on 204 response (delete success)
+  htmx.on("htmx:beforeSwap", function (e) {
+    if (e.detail.target.id === "dialog" && e.detail.xhr.status === 204) {
+      model.classList.add("hidden")
+    }
+  })
+
+  // Close modal on ESC key
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      model.classList.add("hidden")
+    }
+  })
+    </script>
     <script src="{% static 'color_schemes.js' %}"></script>
     <script src="{% static 'svg.js' %}"></script>
     <script src="{% static 'headingSplit.js' %}"></script>

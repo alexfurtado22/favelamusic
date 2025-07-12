@@ -63,7 +63,7 @@
   --color-surface-2: oklch(96.7% 0.003 264.542);
   --color-surface-3: oklch(92.8% 0.006 264.531);
   --color-surface-4: oklch(87.2% 0.01 258.338);
-  --color-surface-shadow: oklch(27.8% 0.033 256.848);
+  --color-surface-shadow: oklch(0.8015 0 0);
   --color-shadow-strength: 0.02;
   --color-brand: oklch(64.6% 0.222 41.116);
   --color-grid-dot: oklch(0.8549 0.0056 274.95);
@@ -348,6 +348,18 @@ label {
   --time: 7s;
   --count: 100;
   --turns: 6;
+}
+
+.loader-wrapper {
+  opacity: 0;
+  animation: fadeIn 0.1s ease-in forwards;
+  animation-delay: 7s;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
 }
 
 .circle {

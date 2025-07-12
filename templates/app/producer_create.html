@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static widget_tweaks %}
 {% block body %}
-    <div class="col-span-2">
+    <section class="col-span-2">
         <h1 class="split-heading font-graffiti text-fluid-2 max-md:text-fluid-1 text-brand text-center mb-4">
             Create a New Producer
         </h1>
@@ -29,21 +29,21 @@
                 </div>
             </fieldset>
             <!-- Email -->
-            <fieldset class="mb-4 space-y-1">
+            <fieldset class="mb-8 space-y-1">
                 {% render_field form.email class="input-field placeholder-text-1" placeholder="Email address" %}
             </fieldset>
             <!-- Website -->
-            <fieldset class="mb-4 space-y-1">
+            <fieldset class="mb-8 space-y-1">
                 {% render_field form.website class="input-field placeholder-text-1" placeholder="Website URL" %}
             </fieldset>
             <!-- Submit -->
-            <div class="flex items-center space-x-4 mt-6">
-                <button type="submit" class="btn">Create Producer</button>
-                <a href="{% url 'home' %}"
-                   class="ml-auto text-brand/80 hover:text-brand/30 underline">Back to list</a>
+            <div class="flex justify-center items-center space-x-4 mt-6 max-sm:flex-col gap-4">
+                <button type="submit" class="btn max-sm:w-full">Create Producer</button>
+                <a href="{% url 'create_artist' %}"
+                   class="text-brand/80 hover:text-brand/30 underline">Back to Create</a>
             </div>
         </form>
-    </div>
+    </section>
 {% endblock body %}
 {% block page_js %}
     <script src="{% static 'color_schemes.js' %}"></script>

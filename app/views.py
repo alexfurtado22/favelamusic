@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.core.mail import send_mail
 from django.db import IntegrityError  # <-- Add this import
 from django.db.models import Avg, Count, Prefetch
@@ -29,6 +30,7 @@ class ArtistListView(ListView):
     model = Artist
     template_name = "app/home.html"
     context_object_name = "artists"
+    paginate_by = 6
 
     def get_queryset(self):
         queryset = (
@@ -36,14 +38,34 @@ class ArtistListView(ListView):
             .get_queryset()
             .select_related("creator", "producer", "producer__creator")
             .annotate(avg_rating=Avg("ratings__score"), num_ratings=Count("ratings"))
-            .order_by("-avg_rating", "-num_ratings")
         )
+
+        search_term = self.request.GET.get("q")
+        if search_term:
+            # Search in name (A), genre (B), creator__username (C)
+            search_vector = (
+                SearchVector("name", weight="A")
+                + SearchVector("genre", weight="B")
+                + SearchVector("creator__username", weight="C")
+            )
+            search_query = SearchQuery(search_term)
+
+            queryset = (
+                queryset.annotate(
+                    search=search_vector,
+                    rank=SearchRank(search_vector, search_query),
+                )
+                .filter(rank__gte=0.2)  # Exclude irrelevant results
+                .order_by("-rank", "-avg_rating", "-num_ratings")
+            )
+        else:
+            queryset = queryset.order_by("-avg_rating", "-num_ratings")
+
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Provide range_100 to all templates (login or not)
         context["range_100"] = range(1, 101)
 
         if self.request.user.is_authenticated:
@@ -52,6 +74,7 @@ class ArtistListView(ListView):
             ).get(pk=self.request.user.pk)
             context["annotated_user"] = user_with_count
 
+        context["search_term"] = self.request.GET.get("q", "")
         return context
 
 
@@ -169,7 +192,7 @@ class ProducerCreateView(LoginRequiredMixin, CreateView, SuccessMessageMixin):
         "email",
         "website",
     ]
-    success_url = reverse_lazy("home")
+    success_url = reverse_lazy("create_artist")
     success_message = "Producer '%(name)s' created successfully!"
 
     def form_valid(self, form):
@@ -364,8 +387,16 @@ class RatingUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         context["user_rating"] = user_rating
         return context
 
+    def form_valid(self, form):
+        # Manually create the success message
+        messages.success(
+            self.request,
+            f"Your rating for '{self.object.artist.name}' has been updated successfully.",
+        )
+        return super().form_valid(form)
+
     def get_success_url(self):
-        return reverse_lazy("home")
+        return reverse_lazy("artist-detail", kwargs={"pk": self.object.artist.pk})
 
 
 # === ADDITION: View to delete a rating ===
@@ -389,7 +420,23 @@ class RatingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return self.request.user == rating.user
 
     def get_success_url(self):
-        return reverse_lazy("home")
+        """
+        Redirects the user back to the artist's detail page after
+        successfully deleting a rating.
+        """
+        return reverse_lazy("artist-detail", kwargs={"pk": self.object.artist.pk})
+
+    def post(self, request, *args, **kwargs):
+        """
+        Manually create a success message before the object is deleted.
+        """
+        # Get the object before it's deleted to use its name in the message
+        rating_object = self.get_object()
+        messages.success(
+            self.request,
+            f"Your rating for '{rating_object.artist.name}' has been deleted.",
+        )
+        return super().post(request, *args, **kwargs)
 
 
 class PlaylistListView(LoginRequiredMixin, ListView):
@@ -445,7 +492,7 @@ class PlaylistDetailView(LoginRequiredMixin, DetailView):
         return queryset.get(pk=self.kwargs["pk"])
 
 
-class PlaylistCreateView(LoginRequiredMixin, CreateView):
+class PlaylistCreateView(LoginRequiredMixin, CreateView, SuccessMessageMixin):
     """
     Handles the creation of a new playlist.
     """
@@ -454,13 +501,16 @@ class PlaylistCreateView(LoginRequiredMixin, CreateView):
     form_class = PlaylistForm
     template_name = "app/playlist_form.html"
     success_url = reverse_lazy("playlist-list")
+    success_message = "Playlist '%(title)s' was created successfully."
 
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
 
-class PlaylistUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class PlaylistUpdateView(
+    LoginRequiredMixin, UserPassesTestMixin, UpdateView, SuccessMessageMixin
+):
     """
     Handles updating an existing playlist.
     """
@@ -469,6 +519,7 @@ class PlaylistUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     form_class = PlaylistForm
     template_name = "app/playlist_form.html"
     success_url = reverse_lazy("playlist-list")
+    success_message = "Playlist '%(title)s' was updated successfully."
 
     def get_queryset(self):
         return Playlist.objects.filter(user=self.request.user)
@@ -477,7 +528,9 @@ class PlaylistUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return self.get_object().user == self.request.user
 
 
-class PlaylistDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class PlaylistDeleteView(
+    LoginRequiredMixin, UserPassesTestMixin, DeleteView, SuccessMessageMixin
+):
     """
     Handles the deletion of a playlist after confirmation.
     """
@@ -485,6 +538,7 @@ class PlaylistDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Playlist
     template_name = "app/playlist_confirm_delete.html"
     success_url = reverse_lazy("playlist-list")
+    success_message = "Playlist '%(title)s' was deleted."
 
     def get_queryset(self):
         return Playlist.objects.filter(user=self.request.user)

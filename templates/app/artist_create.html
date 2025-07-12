@@ -5,8 +5,11 @@
         <h1 class="split-heading text-fluid-3 max-md:text-fluid-2 text-center font-graffiti text-brand mb-4 max-xs:text-fluid-1">
             Create a New Artist
         </h1>
-        <a href="{% url 'create_producer' %}"
-           class="underline text-text-1 hover:text-brand mb-4 inline-block">+ Add producer</a>
+        <button hx-get="{% url 'create_producer' %}"
+                hx-select="section"
+                hx-indicator=".htmx-indicator"
+                hx-target="#producer"
+                class="underline text-text-1 hover:text-brand mb-4 inline-block">+ Add producer</button>
         <form x-data="artistCreate()"
               action="{% url 'create_artist' %}"
               method="post"
@@ -311,7 +314,49 @@
         </form>
     </div>
 {% endblock body %}
+{% block extra_body %}
+    <div class="htmx-indicator fixed top-4 left-1/2 transform -translate-x-1/2 w-6 h-6 border-4 border-t-brand/80 border-surface rounded-full animate-spin z-50 hidden">
+    </div>
+    <!-- Modal Dialog -->
+    <div id="modal-content"
+         class="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm hidden"
+         onclick="document.getElementById('modal-content').classList.add('hidden')">
+        <div class="fixed inset-0 z-50 p-4 flex items-center justify-center"
+             onclick="event.stopPropagation()">
+            <div id="producer"
+                 class="bg-surface-1 p-16 rounded-md shadow-lg w-full max-w-2xl"></div>
+        </div>
+    </div>
+{% endblock extra_body %}
 {% block page_js %}
+    <script type="application/javascript">
+  const model = document.getElementById("modal-content")
+  const producer = document.getElementById("producer")
+
+  // Show modal on successful content swap
+  htmx.on("htmx:afterSwap", function (e) {
+    if (e.detail.target.id === "producer") {
+      producer.classList.remove("hidden")
+      model.classList.remove("hidden")
+    }
+  })
+
+  // Close modal on 204 response (delete success)
+  htmx.on("htmx:beforeSwap", function (e) {
+    if (e.detail.target.id === "producer" && e.detail.xhr.status === 204) {
+      producer.classList.add("hidden")
+      model.classList.add("hidden")
+    }
+  })
+
+  // Close modal on ESC key
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      producer.classList.add("hidden")
+      model.classList.add("hidden")
+    }
+  })
+    </script>
     <script src="{% static 'color_schemes.js' %}"></script>
     <script src="{% static 'svg.js' %}"></script>
     <script src="{% static 'headingSplit.js' %}"></script>
