@@ -52,7 +52,7 @@
                     {% for field in form %}
                         {% if field.name == "remember" %}
                             <!-- 🟡 "Remember me" checkbox and "Forgot password" link -->
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-center justify-between max-xs:flex-col max-xs:gap-4">
                                 <label class="flex items-center text-sm text-brand/80 gap-2">
                                     {% render_field field class="h-4 w-4 bg-brand/20 border-brand focus:ring-brand ml-2 size-5 cursor-pointer space-x-4 rounded-full border focus:outline-none focus:ring-2;" %}
                                     {{ field.label }}

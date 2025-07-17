@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load allauth account %}
+{% load static %}
+{% block body %}
+    <!-- 🔵 Background decorative blobs -->
+    <!-- 🔵 Main container: centers the panel -->
+    <div class="flex items-center justify-center p-4">
+        <div class="relative w-full max-w-3xl backdrop-blur-lg border border-brand/20 rounded-3xl shadow-2xl overflow-hidden p-4 bg-surface1/30">
+            <!-- Heading -->
+            <h1 class="text-2xl tracking-tight font-semibold text-center mb-4">Manage Your Email Addresses</h1>
+            <p class="text-brand text-sm mb-8 text-center">Add, remove, or change your primary email address.</p>
+            <!-- Emails list form -->
+            {% if emailaddresses %}
+                <form method="post" action="{% url 'account_email' %}" class="space-y-6">
+                    {% csrf_token %}
+                    <fieldset>
+                        <legend class="block text-lg font-medium mb-4 max-sm:text-sm">Your Email Addresses</legend>
+                        <div class="space-y-4">
+                            {% for email in emailaddresses %}
+                                <div class="flex items-center justify-between p-4 bg-brand/5 border border-brand/10 rounded-lg max-md:flex-col max-sm:w-[150px] mx-auto">
+                                    <input type="radio"
+                                           id="email_{{ forloop.counter }}"
+                                           name="email"
+                                           value="{{ email.email }}"
+                                           class="h-4 w-4 mr-2 bg-brand/20 border-brand text-brand focus:ring-brand cursor-pointer"
+                                           {% if email.primary %}checked{% endif %}>
+                                    <label for="email_{{ forloop.counter }}"
+                                           class="flex items-center gap-4 cursor-pointer flex-1 max-sm:text-xs">
+                                        <div class="flex flex-wrap items-center gap-x-3 gap-y-3 max-md:flex-col max-sm:text-sm">
+                                            <p class="text-fluid-0">{{ email.email }}</p>
+                                            {% if email.verified %}
+                                                <span class="text-xs font-medium text-green-600 bg-green-100 dark:bg-green-500/10 dark:text-green-400 px-2 py-0.5 rounded-full">Verified</span>
+                                            {% else %}
+                                                <span class="text-xs font-medium text-yellow-600 bg-yellow-100 dark:bg-yellow-500/10 dark:text-yellow-400 px-2 py-0.5 rounded-full">Unverified</span>
+                                            {% endif %}
+                                            {% if email.primary %}
+                                                <span class="text-xs font-medium text-blue-600 bg-blue-100 dark:bg-blue-500/10 dark:text-blue-400 px-2 py-0.5 rounded-full">Primary</span>
+                                            {% endif %}
+                                        </div>
+                                    </label>
+                                    <button type="submit"
+                                            name="action_remove"
+                                            value="{{ email.email }}"
+                                            aria-label="Remove email {{ email.email }}"
+                                            class="text-sm text-red-600 hover:text-red-800 transition max-sm:mt-3">
+                                        Remove
+                                    </button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+                    <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                        <button type="submit" name="action_primary" class="btn w-full">Make Primary</button>
+                        <button type="submit" name="action_send" class="btn-secondary w-full">Re-send Verification</button>
+                    </div>
+                </form>
+            {% else %}
+                <p class="text-center text-sm text-brand/50 mb-8">No email addresses found.</p>
+            {% endif %}
+            <!-- Add Email form -->
+            {% if can_add_email %}
+                <form method="post"
+                      action="{% url 'account_email' %}"
+                      class="mt-10 pt-8 border-t border-brand/10">
+                    {% csrf_token %}
+                    <h2 class="text-lg text-center font-semibold mb-4">Add New Email Address</h2>
+                    {% if form.non_field_errors %}<p class="text-red-600 mb-4">{{ form.non_field_errors|join:", " }}</p>{% endif %}
+                    <div>
+                        <label for="{{ form.email.id_for_label }}" class="sr-only">{{ form.email.label }}</label>
+                        {% render_field form.email class="input-field w-full" placeholder="Enter new email" %}
+                        {% if form.email.errors %}<p class="text-red-600 mt-1">{{ form.email.errors|join:", " }}</p>{% endif %}
+                    </div>
+                    <button type="submit" name="action_add" class="btn w-full mt-6">Add Email</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+{% endblock body %}

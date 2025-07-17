@@ -122,12 +122,14 @@
                         <p class="text-sm text-gray-500">({{ artist.num_ratings }} rating{{ artist.num_ratings|pluralize }})</p>
                     </div>
                     {% if artist.picture %}
-                        <div class="my-4">
-                            <img src="{{ artist.picture.url }}"
+                        <!-- This container holds the skeleton styles and reserves space -->
+                        <div class="my-4 bg-brand/20 rounded-md animate-pulse mx-auto">
+                            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                                 data-src="{{ artist.picture.url }}"
                                  alt="{{ artist.name }}"
                                  width="350"
                                  height="350"
-                                 class="w-full h-auto object-cover rounded-md">
+                                 class="lazy w-full h-full object-cover rounded-md opacity-0 transition-opacity duration-500">
                         </div>
                     {% endif %}
                     <div class="my-4">
@@ -143,18 +145,24 @@
                         </div>
                     {% endif %}
                     {% if artist.track %}
-                        <div class="my-4">
-                            <audio controls class="w-full">
-                                <source src="{{ artist.track.url }}" type="audio/mpeg">
-                                Your browser does not support the audio element.
+                        <!-- Audio container with skeleton styles -->
+                        <div class="my-4 p-4 bg-brand/20 rounded-lg animate-pulse">
+                            <audio controls
+                                   data-src="{{ artist.track.url }}"
+                                   class="lazy w-full opacity-0 transition-opacity duration-500">
+                                <!-- The <source> tag will be added by our script -->
                             </audio>
                         </div>
                     {% endif %}
                     {% if artist.video %}
-                        <div class="my-4">
-                            <video controls class="w-full rounded-lg">
-                                <source src="{{ artist.video.url }}" type="video/mp4">
-                                Your browser does not support the video tag.
+                        <!-- Video container with skeleton styles -->
+                        <div class="my-4 bg-brand/20 rounded-lg animate-pulse">
+                            <video controls
+                                   muted
+                                   playsinline
+                                   data-src="{{ artist.video.url }}"
+                                   class="lazy w-full rounded-lg opacity-0 transition-opacity duration-500">
+                                <!-- The <source> tag will be added by our script -->
                             </video>
                         </div>
                     {% endif %}
@@ -269,6 +277,76 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/SplitText.min.js"></script>
 {% endblock body %}
 {% block page_js %}
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const lazyMedia = [].slice.call(document.querySelectorAll(".lazy"));
+
+    if ("IntersectionObserver" in window) {
+        let lazyMediaObserver = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    let media = entry.target;
+                    let container = media.parentElement;
+
+                    if (media.tagName === 'IMG') {
+                        // Handle lazy loading for images
+                        media.src = media.dataset.src;
+                        media.onload = () => {
+                            media.classList.remove('opacity-0');
+                            container.classList.remove('animate-pulse', 'bg-brand/20');
+                        };
+                    } else if (media.tagName === 'VIDEO' || media.tagName === 'AUDIO') {
+                        // Handle lazy loading for videos and audio
+                        let source = document.createElement('source');
+                        source.src = media.dataset.src;
+                        
+                        // Set the correct type based on tag
+                        if (media.tagName === 'VIDEO') {
+                            source.type = 'video/mp4';
+                        } else { // AUDIO
+                            source.type = 'audio/mpeg';
+                        }
+                        
+                        media.appendChild(source);
+                        media.load(); // Tell the media element to load
+
+                        // 'loadeddata' event is fired when the first bit of data is available
+                        media.onloadeddata = () => {
+                            media.classList.remove('opacity-0');
+                            container.classList.remove('animate-pulse', 'bg-brand/20');
+                        };
+                    }
+
+                    media.classList.remove("lazy");
+                    lazyMediaObserver.unobserve(media);
+                }
+            });
+        });
+
+        lazyMedia.forEach(function(media) {
+            lazyMediaObserver.observe(media);
+        });
+    } else {
+        // Fallback for very old browsers
+        lazyMedia.forEach(function(media) {
+            if (media.tagName === 'IMG') {
+                media.src = media.dataset.src;
+            } else if (media.tagName === 'VIDEO' || media.tagName === 'AUDIO') {
+                let source = document.createElement('source');
+                source.src = media.dataset.src;
+                if (media.tagName === 'VIDEO') {
+                    source.type = 'video/mp4';
+                } else {
+                    source.type = 'audio/mpeg';
+                }
+                media.appendChild(source);
+                media.load();
+            }
+        });
+    }
+});
+
+    </script>
     <script src="{% static 'mainAnimations.js' %}"></script>
     <script src="{% static 'color_schemes.js' %}"></script>
     <script src="{% static 'svg.js' %}"></script>

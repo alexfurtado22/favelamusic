@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load allauth account %}
+{% load static %}
+{% block head_title %}
+  {% trans "Sign Out" %}
+{% endblock head_title %}
+{% block body %}
+  <!-- 🔵 Main container -->
+  <div class="flex items-center justify-center p-4">
+    <div class="relative w-full max-w-lg text-center backdrop-blur-lg border border-brand/20 rounded-3xl shadow-2xl overflow-hidden p-8 sm:p-10 bg-surface-1/30">
+      <!-- Icon -->
+      <div class="flex justify-center items-center mb-6">
+        <div class="flex items-center justify-center h-16 w-16 rounded-full bg-red-500/10">
+          <svg class="h-8 w-8 text-red-500"
+               xmlns="http://www.w3.org/2000/svg"
+               fill="none"
+               viewBox="0 0 24 24"
+               stroke-width="1.5"
+               stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+          </svg>
+        </div>
+      </div>
+      <!-- Heading -->
+      <h1 class="text-2xl tracking-tight font-semibold">{% trans "Sign Out" %}</h1>
+      <!-- Content -->
+      <p class="text-brand/50 dark:text-brand/40 text-sm mt-4 mb-8">
+        {% trans "Are you sure you want to sign out of your account?" %}
+      </p>
+      <!-- Form and Actions -->
+      <form method="post" action="{% url 'account_logout' %}">
+        {% csrf_token %}
+        {{ redirect_field }}
+        <div class="flex flex-col-reverse sm:flex-row gap-4">
+          <button type="button"
+                  onclick="window.history.back()"
+                  class="w-full btn-secondary">{% trans "Cancel" %}</button>
+          <button type="submit" class="w-full btn-danger">{% trans "Sign Out" %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock body %}

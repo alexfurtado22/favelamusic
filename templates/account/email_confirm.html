@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load allauth account %}
+{% load static %}
+{% block head_title %}
+    {% trans "Confirm Email Address" %}
+{% endblock head_title %}
+{% block body %}
+    <!-- 🔵 Background decorative blobs -->
+    <div class="absolute inset-0 -z-10 overflow-hidden">
+        <div class="absolute top-1/4 left-1/2 h-72 w-72 max-sm:h-30 max-sm:w-30 bg-brand opacity-30 rounded-full blur-3xl animate-pulse">
+        </div>
+        <div class="absolute bottom-8 right-8 h-48 w-48 max-sm:h-30 max-sm:w-30 bg-brand opacity-20 rounded-full blur-3xl animate-pulse">
+        </div>
+    </div>
+    <!-- 🔵 Main container -->
+    <div class="flex items-center justify-center p-4">
+        <div class="relative w-full max-w-lg text-center backdrop-blur-lg border border-brand/20 rounded-3xl shadow-2xl overflow-hidden p-8 sm:p-10 bg-surface-1/20">
+            {% if confirmation %}
+                {% user_display confirmation.email_address.user as user_display %}
+                {% if can_confirm %}
+                    <!-- ✅ Success State: Ready to Confirm -->
+                    <div class="flex justify-center items-center mb-6">
+                        <div class="flex items-center justify-center h-16 w-16 rounded-full bg-green-500/10">
+                            <svg class="h-8 w-8 text-green-500"
+                                 xmlns="http://www.w3.org/2000/svg"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke-width="1.5"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h1 class="text-2xl text-brand tracking-tight font-semibold">{% trans "Confirm Your Email Address" %}</h1>
+                    <p class="text-sm mt-4 mb-8">
+                        {% blocktrans with confirmation.email_address.email as email %}
+                            Please confirm that <a href="mailto:{{ email }}" class="font-semibold text-brand hover:text-brand/70">{{ email }}</a> is an email address for user {{ user_display }}.
+                        {% endblocktrans %}
+                    </p>
+                    <form method="post"
+                          action="{% url 'account_confirm_email' confirmation.key %}">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full btn">{% trans "Confirm" %}</button>
+                    </form>
+                {% else %}
+                    <!-- ⚠️ Warning State: Already Confirmed -->
+                    <div class="flex justify-center items-center mb-6">
+                        <div class="flex items-center justify-center h-16 w-16 rounded-full bg-yellow-500/10">
+                            <svg class="h-8 w-8 text-yellow-500"
+                                 xmlns="http://www.w3.org/2000/svg"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke-width="1.5"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h1 class="text-2xl tracking-tight font-semibold">{% trans "Email Already Confirmed" %}</h1>
+                    <p class="text-brand text-sm mt-4 mb-8">
+                        {% blocktrans %}
+                            Unable to confirm {{ confirmation.email_address.email }} because it is already in use by a different account.
+                        {% endblocktrans %}
+                    </p>
+                    <a href="{% url 'account_login' %}" class="w-full btn">Return to Login</a>
+                {% endif %}
+            {% else %}
+                <!-- ❌ Error State: Expired/Invalid Link -->
+                <div class="flex justify-center items-center mb-6">
+                    <div class="flex items-center justify-center h-16 w-16 rounded-full bg-red-500/10">
+                        <svg class="h-8 w-8 text-red-500"
+                             xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="1.5"
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                        </svg>
+                    </div>
+                </div>
+                <h1 class="text-2xl text-brand tracking-tight font-semibold">{% trans "Invalid Confirmation Link" %}</h1>
+                <p class="text-sm mt-4 mb-8">
+                    {% url 'account_email' as email_url %}
+                    {% blocktrans %}
+                        This email confirmation link has expired or is invalid. Please <a href="{{ email_url }}" class="font-semibold text-brand hover:text-brand/70">issue a new email confirmation request</a> from your account settings.
+                    {% endblocktrans %}
+                </p>
+                <a href="{% url 'account_login' %}" class="w-full btn">Return to Login</a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock body %}
