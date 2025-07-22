@@ -159,7 +159,7 @@ class Artist(models.Model):
         blank=True, null=True, validators=[validate_youtube_url]
     )
     genre = models.CharField(
-        max_length=20, choices=GENRE_MUSIC, default="Hip-Hop / Rap"
+        max_length=20, choices=GENRE_MUSIC, default="Hip-Hop / Rap", db_index=True
     )
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="artists"
@@ -232,3 +232,93 @@ class Playlist(models.Model):
     @property
     def artist_count(self):
         return self.artists.count()
+
+
+class Follower(models.Model):
+    """Represents a user following an artist."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="following"
+    )
+    artist = models.ForeignKey(
+        Artist, on_delete=models.CASCADE, related_name="followers"
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "artist"], name="unique_user_artist_follow"
+            )
+        ]
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user.username} follows {self.artist.name}"
+
+
+class TrackPlay(models.Model):
+    """Logs an instance of a track being played."""
+
+    artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name="plays")
+    # You can optionally link this to a user if they are logged in
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    played_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    def __str__(self):
+        return f"Track for {self.artist.name} played at {self.played_at}"
+
+
+# app/models.py
+
+
+class VideoPlay(models.Model):
+    """Logs an instance of a video being played."""
+
+    artist = models.ForeignKey(
+        Artist, on_delete=models.CASCADE, related_name="video_plays"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    played_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    def __str__(self):
+        return f"Video for {self.artist.name} played at {self.played_at}"
+
+
+class Notification(models.Model):
+    class NotificationType(models.TextChoices):
+        NEW_FOLLOWER = "new_follower", "New Follower"
+        NEW_RATING = "new_rating", "New Rating"
+        PLAYLIST_ADD = "playlist_add", "Playlist Add"
+        SYSTEM = "system", "System"
+
+    # The user who receives the notification
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications"
+    )
+    # The user who triggered the notification (optional)
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="sent_notifications",
+    )
+
+    message = models.TextField()
+    notification_type = models.CharField(
+        max_length=20, choices=NotificationType.choices
+    )
+    url = models.URLField(blank=True, null=True)
+    is_read = models.BooleanField(default=False, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Notification for {self.user.username}: {self.message[:50]}"

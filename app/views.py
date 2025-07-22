@@ -1,17 +1,24 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.core.mail import send_mail
+from django.core.paginator import Paginator
 from django.db import IntegrityError  # <-- Add this import
-from django.db.models import Avg, Count, Prefetch
+from django.db.models import Avg, Count, Exists, F, OuterRef, Prefetch, Window
+from django.db.models.functions import Rank, TruncDate
+from django.http import JsonResponse
 from django.shortcuts import (
+    HttpResponseRedirect,
     get_object_or_404,  # <-- Add this import
     redirect,
     render,
 )
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views import View
 from django.views.generic import (
     CreateView,
@@ -21,7 +28,17 @@ from django.views.generic import (
     UpdateView,
 )
 
-from app.models import Artist, Playlist, Producer, Rating, UserProfile
+from app.models import (
+    Artist,
+    Follower,
+    Notification,
+    Playlist,
+    Producer,
+    Rating,
+    TrackPlay,
+    UserProfile,
+    VideoPlay,
+)
 
 from .forms import ContactForm, PlaylistForm, RatingForm  # <-- Add RatingForm import
 
@@ -33,47 +50,55 @@ class ArtistListView(ListView):
     paginate_by = 6
 
     def get_queryset(self):
+        # Start with the base queryset and prefetch related data
         queryset = (
             super()
             .get_queryset()
-            .select_related("creator", "producer", "producer__creator")
+            .select_related("creator", "producer")
             .annotate(avg_rating=Avg("ratings__score"), num_ratings=Count("ratings"))
         )
 
+        # ✨ ADDITION: Annotate with follow status for the logged-in user
+        if self.request.user.is_authenticated:
+            queryset = queryset.annotate(
+                is_following=Exists(
+                    Follower.objects.filter(
+                        user=self.request.user, artist=OuterRef("pk")
+                    )
+                )
+            )
+
+        # Handle search functionality
         search_term = self.request.GET.get("q")
         if search_term:
-            # Search in name (A), genre (B), creator__username (C)
             search_vector = (
                 SearchVector("name", weight="A")
                 + SearchVector("genre", weight="B")
                 + SearchVector("creator__username", weight="C")
             )
             search_query = SearchQuery(search_term)
-
             queryset = (
                 queryset.annotate(
                     search=search_vector,
                     rank=SearchRank(search_vector, search_query),
                 )
-                .filter(rank__gte=0.2)  # Exclude irrelevant results
+                .filter(rank__gte=0.2)
                 .order_by("-rank", "-avg_rating", "-num_ratings")
             )
         else:
+            # Default ordering when not searching
             queryset = queryset.order_by("-avg_rating", "-num_ratings")
 
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         context["range_100"] = range(1, 101)
-
         if self.request.user.is_authenticated:
             user_with_count = UserProfile.objects.annotate(
                 artist_count_annotated=Count("artists")
             ).get(pk=self.request.user.pk)
             context["annotated_user"] = user_with_count
-
         context["search_term"] = self.request.GET.get("q", "")
         return context
 
@@ -440,17 +465,13 @@ class RatingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 class PlaylistListView(LoginRequiredMixin, ListView):
-    """
-    Displays a list of the currently logged-in user's own playlists.
-    """
-
-    model = Playlist
-    template_name = "app/playlist_list.html"
-    context_object_name = "playlists"
+    # ... your other class attributes
 
     def get_queryset(self):
+        # Add select_related("user") to the query
         return (
-            Playlist.objects.filter(user=self.request.user)
+            Playlist.objects.select_related("user")
+            .filter(user=self.request.user)
             .annotate(num_artists=Count("artists"))
             .prefetch_related("artists")
         )
@@ -576,3 +597,208 @@ class AddArtistToPlaylistView(LoginRequiredMixin, View):
             )
 
         return redirect("artist-detail", pk=artist_id)
+
+
+class ArtistDashboardView(LoginRequiredMixin, DetailView):
+    model = Artist
+    template_name = "app/artist_dashboard.html"
+    context_object_name = "artist"
+
+    def get_queryset(self):
+        # OPTIMIZATION: Annotate the main artist object with counts.
+        # This data will be fetched in the initial query for the artist.
+        return Artist.objects.filter(creator=self.request.user).annotate(
+            playlist_count=Count("playlists", distinct=True),
+            follower_count=Count("followers", distinct=True),
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Use `self.object` which is already fetched by the DetailView.
+        artist = self.object
+
+        # --- Chart Data Preparation (Already efficient) ---
+        thirty_days_ago = timezone.now().date() - timedelta(days=30)
+        date_range = [thirty_days_ago + timedelta(days=i) for i in range(31)]
+
+        follower_counts = {
+            item["day"]: item["count"]
+            for item in Follower.objects.filter(
+                artist=artist, created_at__date__gte=thirty_days_ago
+            )
+            .annotate(day=TruncDate("created_at"))
+            .values("day")
+            .annotate(count=Count("id"))
+        }
+
+        play_counts = {
+            item["day"]: item["count"]
+            for item in TrackPlay.objects.filter(
+                artist=artist, played_at__date__gte=thirty_days_ago
+            )
+            .annotate(day=TruncDate("played_at"))
+            .values("day")
+            .annotate(count=Count("id"))
+        }
+
+        video_play_counts = {
+            item["day"]: item["count"]
+            for item in VideoPlay.objects.filter(
+                artist=artist, played_at__date__gte=thirty_days_ago
+            )
+            .annotate(day=TruncDate("played_at"))
+            .values("day")
+            .annotate(count=Count("id"))
+        }
+
+        chart_labels = [day.strftime("%b %d") for day in date_range]
+        context["chart_labels"] = chart_labels
+        context["follower_chart_data"] = [
+            follower_counts.get(day, 0) for day in date_range
+        ]
+        context["play_chart_data"] = [play_counts.get(day, 0) for day in date_range]
+        context["video_play_chart_data"] = [
+            video_play_counts.get(day, 0) for day in date_range
+        ]
+
+        # --- Stat Card Preparation ---
+        context["playlist_appearances"] = artist.playlist_count
+
+        # --- ✨ FINAL OPTIMIZATION: Genre-wide Statistics ---
+        # Get all artists in the same genre once.
+        genre_artists = Artist.objects.filter(genre=artist.genre)
+
+        # Perform one single query for all genre-level aggregates.
+        genre_aggregates = genre_artists.aggregate(
+            total_followers=Count("followers", distinct=True),
+            total_plays=Count("plays", distinct=True),
+            total_video_plays=Count("video_plays", distinct=True),
+            total_artists=Count("id", distinct=True),
+        )
+        total_artists_in_genre = genre_aggregates.get("total_artists", 0)
+        context["total_in_genre"] = total_artists_in_genre
+
+        # Calculate averages in Python, avoiding extra queries.
+        if total_artists_in_genre > 0:
+            context["genre_avg_followers"] = (
+                genre_aggregates.get("total_followers", 0) / total_artists_in_genre
+            )
+        else:
+            context["genre_avg_followers"] = 0
+
+        context["total_genre_plays"] = genre_aggregates.get("total_plays", 0)
+        context["total_genre_video_plays"] = genre_aggregates.get(
+            "total_video_plays", 0
+        )
+
+        # Perform a second, separate query just to get the rank for the specific artist.
+        # This is now the only other query needed for genre stats.
+        try:
+            ranked_artist = (
+                genre_artists.annotate(f_count=Count("followers"))
+                .annotate(rank=Window(expression=Rank(), order_by=F("f_count").desc()))
+                .get(pk=artist.pk)
+            )
+            context["genre_rank"] = ranked_artist.rank
+        except Artist.DoesNotExist:
+            context["genre_rank"] = "N/A"
+
+        return context
+
+
+class FollowToggleView(LoginRequiredMixin, View):
+    def post(self, request, artist_id):
+        artist = get_object_or_404(Artist, id=artist_id)
+        follower, created = Follower.objects.get_or_create(
+            user=request.user, artist=artist
+        )
+        if not created:
+            follower.delete()
+        # Redirect back to the page the user was on.
+        return redirect(request.META.get("HTTP_REFERER", "home"))
+
+
+class TrackPlayView(View):
+    """
+    This view does two things on a GET request:
+    1. Creates a TrackPlay record in the database for the given artist.
+    2. Redirects the user to the actual URL of the MP3 file.
+    """
+
+    def get(self, request, artist_id):
+        artist = get_object_or_404(Artist, id=artist_id)
+
+        # Log the track play. Link it to the user if they are logged in.
+        TrackPlay.objects.create(
+            artist=artist, user=request.user if request.user.is_authenticated else None
+        )
+
+        # Redirect to the actual file URL so the browser can play it.
+        return HttpResponseRedirect(artist.track.url)
+
+
+# app/views.py
+
+# app/views.py
+
+
+class VideoPlayView(View):
+    def get(self, request, artist_id):
+        artist = get_object_or_404(Artist, id=artist_id)
+
+        # Create the VideoPlay record
+        VideoPlay.objects.create(
+            artist=artist, user=request.user if request.user.is_authenticated else None
+        )
+
+        # FIX: Redirect to the video file, not the track
+        return HttpResponseRedirect(artist.video.url)
+
+
+class UnreadNotificationsAPIView(LoginRequiredMixin, View):
+    """API endpoint for fetching paginated unread notifications."""
+
+    def get(self, request, *args, **kwargs):
+        notifications_query = request.user.notifications.filter(
+            is_read=False
+        ).select_related("sender")
+
+        paginator = Paginator(notifications_query, 10)  # Show 10 notifications per page
+        page_number = request.GET.get("page", 1)
+        page_obj = paginator.get_page(page_number)
+
+        data = [
+            {
+                "id": n.id,
+                "sender_avatar_url": n.sender.avatar.url
+                if hasattr(n.sender, "avatar") and n.sender.avatar
+                else None,
+                "message": n.message,
+                "url": n.url,
+                "created_at": n.created_at.isoformat(),
+            }
+            for n in page_obj
+        ]
+
+        return JsonResponse({"notifications": data, "has_more": page_obj.has_next()})
+
+
+class NotificationListView(LoginRequiredMixin, ListView):
+    """A page to display all of a user's notifications."""
+
+    model = Notification
+    template_name = "app/notifications_list.html"
+    context_object_name = "notifications"
+    paginate_by = 20
+
+    def get_queryset(self):
+        # Mark all as read when visiting the full page
+        self.request.user.notifications.update(is_read=True)
+        return self.request.user.notifications.all().select_related("sender")
+
+
+class MarkAllAsReadView(LoginRequiredMixin, View):
+    def post(self, request):
+        request.user.notifications.filter(is_read=False).update(is_read=True)
+        return JsonResponse({"status": "success"})

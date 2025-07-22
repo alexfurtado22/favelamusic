@@ -4,10 +4,13 @@ from app.views import (
     AddArtistToPlaylistView,
     # Artist and Rating
     ArtistCreateView,
+    ArtistDashboardView,
     ArtistDeleteView,
     ArtistDetailView,
     ArtistListView,
     ArtistUpdateView,
+    MarkAllAsReadView,
+    NotificationListView,
     PlaylistCreateView,
     PlaylistDeleteView,
     PlaylistDetailView,
@@ -19,11 +22,16 @@ from app.views import (
     RatingCreateView,
     RatingDeleteView,
     RatingUpdateView,
+    TrackPlayView,
+    UnreadNotificationsAPIView,
     # User Profile & Contact
     UserProfileDetailView,
+    VideoPlayView,
     contact_success_view,
     contact_view,
 )
+
+from .views import FollowToggleView
 
 urlpatterns = [
     # 🔥 Artist and Rating
@@ -38,6 +46,33 @@ urlpatterns = [
     path("artists/<int:pk>/rate/", RatingCreateView.as_view(), name="artist-rate"),
     path("rating/<int:pk>/update/", RatingUpdateView.as_view(), name="rating-update"),
     path("rating/<int:pk>/delete/", RatingDeleteView.as_view(), name="rating-delete"),
+    path(
+        "artists/<int:pk>/dashboard/",
+        ArtistDashboardView.as_view(),
+        name="artist-dashboard",
+    ),
+    path(
+        "artists/<int:artist_id>/follow/",
+        FollowToggleView.as_view(),
+        name="follow-toggle",
+    ),
+    path("artists/<int:artist_id>/play/", TrackPlayView.as_view(), name="play-track"),
+    path(
+        "artists/<int:artist_id>/play-video/",
+        VideoPlayView.as_view(),
+        name="play-video",
+    ),
+    path("notifications/", NotificationListView.as_view(), name="notifications-list"),
+    path(
+        "api/notifications/unread/",
+        UnreadNotificationsAPIView.as_view(),
+        name="unread-notifications-api",
+    ),
+    path(
+        "api/notifications/mark-all-as-read/",
+        MarkAllAsReadView.as_view(),
+        name="mark-all-as-read",
+    ),
     # 🔥 User Profile & Contact
     path("users/<str:username>/", UserProfileDetailView.as_view(), name="user-profile"),
     path("contact/", contact_view, name="contact"),

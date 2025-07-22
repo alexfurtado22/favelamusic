@@ -1,0 +1,185 @@
+<div x-data="notifications()" x-init="init()" class="relative">
+    <!-- Desktop: Bell + dropdown -->
+    <div class="hidden md:block relative">
+        <button @click="toggle"
+                class="relative p-2 rounded-full hover:bg-brand/20"
+                aria-label="View notifications">
+            <!-- Bell SVG -->
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke-width="1.5"
+                 stroke="currentColor"
+                 class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0M3.124 7.5A8.969 8.969 0 0 1 5.292 3m13.416 0a8.969 8.969 0 0 1 2.168 4.5" />
+            </svg>
+            <span x-show="unreadCount > 0"
+                  x-text="unreadCount"
+                  class="absolute top-0 right-0 h-5 w-5 text-xs font-bold text-white bg-red-500 rounded-full flex items-center justify-center"
+                  style="display: none"></span>
+        </button>
+        <!-- Dropdown -->
+        <div x-show="open"
+             @click.away="open = false"
+             x-cloak
+             class="absolute right-0 mt-2 w-80 origin-top-right rounded-xl bg-surface-1/20 shadow-lg border border-brand/20 z-50">
+            <!-- Dropdown content here... -->
+            <div class="p-4 flex justify-between items-center border-b border-brand/10">
+                <h3 class="font-semibold">Notifications</h3>
+                <button @click="markAllAsRead"
+                        x-show="notifications.length > 0"
+                        class="text-sm text-brand hover:underline">Mark all as read</button>
+            </div>
+            <div class="max-h-96 overflow-y-auto">
+                <template x-if="notifications.length === 0 && !isLoading">
+                    <p class="text-center py-8">You have no new notifications.</p>
+                </template>
+                <template x-for="notification in notifications" :key="notification.id">
+                    <a :href="notification.url || '#'"
+                       class="flex items-start gap-4 p-4 hover:bg-brand/30 border-b border-brand/5">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="1.5"
+                             stroke="currentColor"
+                             class="h-8 w-8 rounded-full bg-brand/20 p-1 flex-shrink-0">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                        </svg>
+                        <div class="flex-1">
+                            <p class="text-sm" x-html="notification.message"></p>
+                            <p class="text-xs text-gray-400 mt-1"
+                               x-text="timeAgo(notification.created_at)"></p>
+                        </div>
+                    </a>
+                </template>
+                <div x-show="isLoading" class="text-center py-4">
+                    <p class="text-sm text-gray-400">Loading...</p>
+                </div>
+                <div x-show="hasMore && !isLoading && notifications.length > 0"
+                     class="p-2">
+                    <button @click="fetchNotifications(false)"
+                            class="w-full text-center text-sm text-brand hover:underline p-2">Load more</button>
+                </div>
+            </div>
+            <div class="p-2 border-t border-brand/10">
+                <a href="{% url 'notifications-list' %}"
+                   class="block w-full text-center text-sm hover:text-brand p-2">View all notifications</a>
+            </div>
+        </div>
+    </div>
+    <!-- Mobile: Just bell icon that links directly -->
+    <div class="md:hidden">
+        <button @click="window.location.href = '{% url 'notifications-list' %}'"
+                class="relative p-2 rounded-full hover:bg-brand/20"
+                aria-label="View notifications">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke-width="1.5"
+                 stroke="currentColor"
+                 class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0M3.124 7.5A8.969 8.969 0 0 1 5.292 3m13.416 0a8.969 8.969 0 0 1 2.168 4.5" />
+            </svg>
+            <span x-show="unreadCount > 0"
+                  x-text="unreadCount"
+                  class="absolute top-0 right-0 h-5 w-5 text-xs font-bold text-white bg-red-500 rounded-full flex items-center justify-center"
+                  style="display: none"></span>
+        </button>
+    </div>
+</div>
+<script>
+function notifications() {
+  return {
+    open: false,
+    unreadCount: 0,
+    notifications: [],
+    page: 1,
+    hasMore: true,
+    isLoading: false,
+    socket: null,
+
+    init() {
+      this.fetchNotifications(true);
+      this.connectWebSocket();
+    },
+
+    toggle() {
+      this.open = !this.open;
+    },
+
+    connectWebSocket() {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      this.socket = new WebSocket(`${protocol}//${window.location.host}/ws/notifications/`);
+
+      this.socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        this.addNotification(data.message, data.url, new Date().toISOString(), data.sender_avatar_url);
+      };
+
+      this.socket.onclose = () => {
+        console.warn('WebSocket closed. Falling back to polling.');
+        setInterval(() => this.fetchNotifications(), 30000);
+      };
+
+      this.socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        this.socket.close();
+      };
+    },
+
+    fetchNotifications(isInitial = false) {
+      if (this.isLoading || !this.hasMore) return;
+      this.isLoading = true;
+
+      fetch(`{% url 'unread-notifications-api' %}?page=${this.page}`)
+        .then(response => response.json())
+        .then(data => {
+          const newNotifications = data.notifications.map(n => ({...n, id: n.id}));
+          if (isInitial) {
+            this.notifications = newNotifications;
+          } else {
+            const existingIds = new Set(this.notifications.map(n => n.id));
+            const filteredNotifications = newNotifications.filter(n => !existingIds.has(n.id));
+            this.notifications.push(...filteredNotifications);
+          }
+          this.hasMore = data.has_more;
+          if (data.has_more) this.page++;
+          this.unreadCount = this.notifications.length;
+          this.isLoading = false;
+        });
+    },
+
+    addNotification(message, url, createdAt, senderAvatarUrl) {
+      this.notifications.unshift({ message, url, created_at: createdAt, sender_avatar_url: senderAvatarUrl, id: Date.now() });
+      this.unreadCount++;
+    },
+
+    markAllAsRead() {
+      fetch("{% url 'mark-all-as-read' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+      }).then(() => {
+        this.notifications = [];
+        this.unreadCount = 0;
+        this.open = false;
+      });
+    },
+
+    timeAgo(dateString) {
+      const date = new Date(dateString);
+      const seconds = Math.floor((new Date() - date) / 1000);
+      let interval = seconds / 31536000;
+      if (interval > 1) return Math.floor(interval) + " years ago";
+      interval = seconds / 2592000;
+      if (interval > 1) return Math.floor(interval) + " months ago";
+      interval = seconds / 86400;
+      if (interval > 1) return Math.floor(interval) + " days ago";
+      interval = seconds / 3600;
+      if (interval > 1) return Math.floor(interval) + " hours ago";
+      interval = seconds / 60;
+      if (interval > 1) return Math.floor(interval) + " minutes ago";
+      return "Just now";
+    }
+  }
+}
+</script>

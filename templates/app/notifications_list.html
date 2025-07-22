@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block head_title %}
+  All Notifications
+{% endblock head_title %}
+{% block body %}
+  <div class="max-w-3xl mx-auto p-8">
+    <h1 class="text-3xl font-bold mb-8">All Notifications</h1>
+    <div class="space-y-4">
+      {% for notification in notifications %}
+        <a href="{{ notification.url|default:'#' }}"
+           class="flex items-start gap-4 p-4 rounded-lg bg-white dark:bg-gray-800 border border-brand/10 hover:shadow-lg transition">
+          <img src="{{ notification.sender.avatar.url|default:'https://placehold.co/48x48/E2E8F0/4A5568?text=??' }}"
+               alt="Avatar"
+               width="48"
+               height="48"
+               class="h-12 w-12 rounded-full bg-gray-200">
+          <div class="flex-1">
+            <p class="text-sm">{{ notification.message|safe }}</p>
+            <p class="text-xs text-gray-400 mt-1">{{ notification.created_at|timesince }} ago</p>
+          </div>
+        </a>
+      {% empty %}
+        <p class="text-center text-gray-500 py-12">You have no notifications.</p>
+      {% endfor %}
+    </div>
+    <!-- Pagination -->
+    {% if is_paginated %}
+      <div class="mt-8">
+        <!-- Your pagination component here -->
+      </div>
+    {% endif %}
+  </div>
+{% endblock body %}

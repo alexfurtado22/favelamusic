@@ -318,6 +318,28 @@ body::-webkit-scrollbar-thumb {
     0 0 120px -10px var(--color-brand);
 }
 
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-brand);
+  border: 2px solid var(--color-brand);
+  border-radius: 6px;
+  box-shadow: none;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s,
+    background-color 0.3s;
+}
+
+.btn-outline:hover {
+  background-color: color-mix(
+    in oklch,
+    var(--color-brand) 10%,
+    var(--color-surface-4)
+  );
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--color-brand) 15%, transparent);
+}
+
 .input-field {
   @apply border-brand/20 bg-surface-1 focus:ring-brand mt-1 w-full rounded-md border p-2 focus:outline-none focus:ring-2;
 }

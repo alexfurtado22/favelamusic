@@ -185,11 +185,20 @@ AUTHENTICATION_BACKENDS = [
 
 TAILWIND_APP_NAME = "theme"
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+
+ASGI_APPLICATION = "core.asgi.application"
+
 # Application definition
 
 # settings.py
 
 DJANGO_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -199,6 +208,7 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     "django.contrib.humanize",
+    "channels",
 ]
 
 THIRD_PARTY_APPS = [
@@ -214,7 +224,7 @@ THIRD_PARTY_APPS = [
 ]
 
 PROJECT_APPS = [
-    "app.apps.AppConfig",  # Replace with your actual app config if different
+    "app.apps.MyAppConfig",  # Replace with your actual app config if different
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
