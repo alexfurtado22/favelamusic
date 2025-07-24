@@ -172,8 +172,16 @@ class Artist(models.Model):
     instagram = models.URLField(blank=True, validators=[validate_instagram_url])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    location_name = models.CharField(
+        max_length=255, blank=True, null=True, help_text="e.g., Rocinha, Rio de Janeiro"
+    )
+    latitude = models.FloatField(
+        blank=True, null=True, help_text="The latitude of the artist's location."
+    )
+    longitude = models.FloatField(
+        blank=True, null=True, help_text="The longitude of the artist's location."
+    )
 
-    # === ADDITION: A property to calculate the average rating ===
     @property
     def average_rating(self):
         # Calculates the average score of all ratings, returns 0 if none exist.

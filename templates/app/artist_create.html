@@ -181,6 +181,39 @@
                     </div>
                 {% endif %}
             </fieldset>
+            <!-- START: New Location Fields -->
+            <fieldset class="space-y-2 p-4 border rounded-lg">
+                <legend class="text-lg font-medium px-2">Location</legend>
+                <!-- Location Name -->
+                <div class="space-y-2">
+                    <label for="{{ form.location_name.id_for_label }}"
+                           class="block text-sm font-medium">
+                        <span class="flex items-center">
+                            <svg class="h-5 w-5 mr-2"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Location Name (e.g., Rocinha, Rio de Janeiro)
+                        </span>
+                    </label>
+                    {% render_field form.location_name class="input-field" placeholder="Enter location name" %}
+                    {% if form.location_name.errors %}<div class="text-red-500 text-sm">{{ form.location_name.errors }}</div>{% endif %}
+                </div>
+                <!-- Geolocation Button -->
+                <div class="pt-2">
+                    <button type="button" id="getLocationBtn" class="text-sm">Get Current Location</button>
+                    <p id="locationStatus" class="text-sm mt-2"></p>
+                </div>
+                <!-- Hidden fields for latitude and longitude -->
+                {{ form.latitude }}
+                {{ form.longitude }}
+            </fieldset>
+            <!-- END: New Location Fields -->
+            <!-- END: New Location Fields -->
             <!-- Content -->
             <fieldset class="space-y-2">
                 <label for="{{ form.content.id_for_label }}"
@@ -329,6 +362,46 @@
     </div>
 {% endblock extra_body %}
 {% block page_js %}
+    <!-- START: Geolocation Script -->
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+  const latitudeInput = document.querySelector('input[name="latitude"]');
+  const longitudeInput = document.querySelector('input[name="longitude"]');
+  const getLocationBtn = document.getElementById('getLocationBtn');
+  const locationStatus = document.getElementById('locationStatus');
+
+  if (getLocationBtn) {
+    getLocationBtn.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        locationStatus.textContent = 'Geolocation is not supported by your browser.';
+        locationStatus.className = 'text-red-500 text-sm mt-2';
+      } else {
+        locationStatus.textContent = 'Fetching location...';
+        locationStatus.className = 'text-gray-500 text-sm mt-2';
+        navigator.geolocation.getCurrentPosition(success, error);
+      }
+    });
+  }
+
+  function success(position) {
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+    if (latitudeInput && longitudeInput) {
+      latitudeInput.value = lat.toFixed(6);
+      longitudeInput.value = lon.toFixed(6);
+    }
+
+    locationStatus.textContent = `Location found! Latitude: ${lat.toFixed(4)}, Longitude: ${lon.toFixed(4)}`;
+    locationStatus.className = 'text-green-600 text-sm mt-2';
+  }
+
+  function error() {
+    locationStatus.textContent = 'Unable to retrieve your location. Please check browser permissions.';
+    locationStatus.className = 'text-red-500 text-sm mt-2';
+  }
+});
+    </script>
+    <!-- END: Geolocation Script -->
     <script type="application/javascript">
   const model = document.getElementById("modal-content")
   const producer = document.getElementById("producer")

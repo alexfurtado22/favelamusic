@@ -71,14 +71,20 @@ class ArtistAdmin(admin.ModelAdmin):
         "name",
         "genre",
         "creator",
-        "producer",
-        "picture_preview",
-        "track_preview",
-        "video_preview",
+        # Adicionados campos de localização à lista
+        "location_name",
+        "latitude",
+        "longitude",
         "created_at",
     )
-    ordering = ("created_at",)
-    search_fields = ("name", "genre", "creator__username", "producer__name")
+    ordering = ("-created_at",)
+    search_fields = (
+        "name",
+        "genre",
+        "creator__username",
+        "producer__name",
+        "location_name",
+    )
     list_filter = ("genre", "creator", "producer")
     date_hierarchy = "created_at"
     readonly_fields = (
@@ -89,28 +95,48 @@ class ArtistAdmin(admin.ModelAdmin):
         "video_preview",
     )
 
-    # 👇 Control the field order in the form
-    fields = (
-        "name",
-        "picture",
-        "track",
-        "video",
-        # now comes after video
-        "genre",
-        "producer",
-        "content",
-        "instagram",
-        "youtube_link",
-        "twitter",
-        "creator",
-        "created_at",
-        "updated_at",
-        "picture_preview",
-        "track_preview",
-        "video_preview",
+    # Uso de fieldsets para uma melhor organização do formulário de edição
+    fieldsets = (
+        (
+            "Main Information",
+            {"fields": ("name", "creator", "producer", "genre", "content")},
+        ),
+        (
+            "Location",
+            {
+                "fields": ("location_name", "latitude", "longitude"),
+                "description": "You can manually enter coordinates or use the 'Get Current Location' button on the main site's creation form.",
+            },
+        ),
+        (
+            "Media Files",
+            {
+                "fields": (
+                    "picture",
+                    "picture_preview",
+                    "track",
+                    "track_preview",
+                    "video",
+                    "video_preview",
+                ),
+            },
+        ),
+        (
+            "Social Links",
+            {
+                "fields": ("instagram", "youtube_link", "twitter"),
+            },
+        ),
+        (
+            "Timestamps",
+            {
+                "fields": ("created_at", "updated_at"),
+                "classes": ("collapse",),  # Torna esta secção recolhível
+            },
+        ),
     )
 
-    # Media preview methods
+    # Media preview methods (o seu código original está perfeito)
     def picture_preview(self, obj):
         if obj.picture:
             return format_html(
@@ -119,7 +145,7 @@ class ArtistAdmin(admin.ModelAdmin):
             )
         return "-"
 
-    picture_preview.short_description = "Picture"
+    picture_preview.short_description = "Picture Preview"
 
     def track_preview(self, obj):
         if obj.track:
@@ -132,7 +158,7 @@ class ArtistAdmin(admin.ModelAdmin):
             )
         return "-"
 
-    track_preview.short_description = "Track"
+    track_preview.short_description = "Track Preview"
 
     def video_preview(self, obj):
         if obj.video:
@@ -145,7 +171,7 @@ class ArtistAdmin(admin.ModelAdmin):
             )
         return "-"
 
-    video_preview.short_description = "Video"
+    video_preview.short_description = "Video Preview"
 
 
 @admin.register(Rating)

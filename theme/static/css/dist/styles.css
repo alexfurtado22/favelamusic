@@ -25,6 +25,7 @@
     --color-green-500: oklch(72.3% 0.219 149.579);
     --color-green-600: oklch(62.7% 0.194 149.214);
     --color-green-800: oklch(44.8% 0.119 151.328);
+    --color-emerald-600: oklch(59.6% 0.145 163.225);
     --color-teal-500: oklch(70.4% 0.14 182.503);
     --color-sky-500: oklch(68.5% 0.169 237.323);
     --color-blue-100: oklch(93.2% 0.032 255.585);
@@ -265,6 +266,9 @@
   }
 }
 @layer utilities {
+  .collapse {
+    visibility: collapse;
+  }
   .sr-only {
     position: absolute;
     width: 1px;
@@ -665,6 +669,9 @@
   }
   .h-80 {
     height: calc(var(--spacing) * 80);
+  }
+  .h-\[80vh\] {
+    height: 80vh;
   }
   .h-fit {
     height: fit-content;
@@ -1119,9 +1126,6 @@
       border-top-color: color-mix(in oklab, var(--color-brand) 80%, transparent);
     }
   }
-  .bg-black {
-    background-color: var(--color-black);
-  }
   .bg-black\/30 {
     background-color: color-mix(in srgb, #000 30%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -1258,6 +1262,12 @@
     background-color: color-mix(in srgb, oklch(96.7% 0.003 264.542) 30%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-surface-2) 30%, transparent);
+    }
+  }
+  .bg-surface-2\/80 {
+    background-color: color-mix(in srgb, oklch(96.7% 0.003 264.542) 80%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-surface-2) 80%, transparent);
     }
   }
   .bg-surface-3 {
@@ -1547,6 +1557,9 @@
     @supports (color: color-mix(in lab, red, red)) {
       color: color-mix(in oklab, var(--color-brand) 80%, transparent);
     }
+  }
+  .text-emerald-600 {
+    color: var(--color-emerald-600);
   }
   .text-gray-300 {
     color: var(--color-gray-300);
@@ -1929,6 +1942,16 @@
       }
     }
   }
+  .hover\:bg-surface-2\/20 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: color-mix(in srgb, oklch(96.7% 0.003 264.542) 20%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--color-surface-2) 20%, transparent);
+        }
+      }
+    }
+  }
   .hover\:bg-surface-4 {
     &:hover {
       @media (hover: hover) {
@@ -2038,6 +2061,13 @@
       }
     }
   }
+  .hover\:opacity-80 {
+    &:hover {
+      @media (hover: hover) {
+        opacity: 80%;
+      }
+    }
+  }
   .hover\:shadow-lg {
     &:hover {
       @media (hover: hover) {
@@ -2113,6 +2143,11 @@
       margin-right: calc(var(--spacing) * 0);
     }
   }
+  .max-lg\:h-\[70vh\] {
+    @media (width < 48rem) {
+      height: 70vh;
+    }
+  }
   .max-lg\:grid-cols-1 {
     @media (width < 48rem) {
       grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -2126,6 +2161,11 @@
   .max-md\:hidden {
     @media (width < 42rem) {
       display: none;
+    }
+  }
+  .max-md\:h-\[60vh\] {
+    @media (width < 42rem) {
+      height: 60vh;
     }
   }
   .max-md\:w-full {
@@ -2197,6 +2237,16 @@
   .max-sm\:h-60 {
     @media (width < 32rem) {
       height: calc(var(--spacing) * 60);
+    }
+  }
+  .max-sm\:h-\[46vh\] {
+    @media (width < 32rem) {
+      height: 46vh;
+    }
+  }
+  .max-sm\:h-\[50vh\] {
+    @media (width < 32rem) {
+      height: 50vh;
     }
   }
   .max-sm\:w-30 {

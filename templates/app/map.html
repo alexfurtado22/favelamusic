@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+{% block body %}
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="split-heading text-fluid-3 max-md:text-fluid-2 text-center font-graffiti text-brand mb-4 max-xs:text-fluid-1">
+            Artists on the Map
+        </h1>
+        <!-- Map container -->
+        <div id="map"
+             class="h-[80vh] w-full rounded-lg shadow-lg max-sm:h-[46vh] max-md:h-[60vh] max-lg:h-[70vh]"></div>
+    </div>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+    <script>
+    // Initialize map centered on Rio de Janeiro
+    const map = L.map('map').setView([-22.9068, -43.1729], 12);
+
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(map);
+
+    // Get artist data from Django context
+    const artists = JSON.parse(`{{ artist_data_json|escapejs }}`);
+
+    // Add markers
+    artists.forEach((artist) => {
+      if (artist.latitude && artist.longitude) {
+        const marker = L.marker([artist.latitude, artist.longitude]).addTo(map);
+
+        let popupContent = '';
+
+        if (artist.picture) {
+          popupContent += `<img src="${artist.picture}" width="100" class="rounded mb-2" alt="${artist.name}" /><br>`;
+        }
+
+        popupContent += `<strong><a href="/artists/${artist.id}/" class="hover:underline">${artist.name}</a></strong><br>`;
+        popupContent += `<em>${artist.genre}</em><br>`;
+        popupContent += `${artist.location_name}`;
+
+        marker.bindPopup(popupContent);
+      }
+    });
+    </script>
+{% endblock body %}
+{% block page_js %}
+    <script src="{% static 'color_schemes.js' %}"></script>
+    <script src="{% static 'svg.js' %}"></script>
+    <script src="{% static 'headingSplit.js' %}"></script>
+    <script src="{% static 'index.js' %}"></script>
+{% endblock page_js %}

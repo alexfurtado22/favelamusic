@@ -1,3 +1,4 @@
+import json
 from datetime import timedelta
 
 from django.conf import settings
@@ -7,6 +8,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import IntegrityError  # <-- Add this import
 from django.db.models import Avg, Count, Exists, F, OuterRef, Prefetch, Window
 from django.db.models.functions import Rank, TruncDate
@@ -25,6 +27,7 @@ from django.views.generic import (
     DeleteView,
     DetailView,
     ListView,
+    TemplateView,
     UpdateView,
 )
 
@@ -117,6 +120,9 @@ class ArtistCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         "twitter",
         "instagram",
         "youtube_link",
+        "location_name",  # add this
+        "latitude",  # add this
+        "longitude",
     ]
     success_url = reverse_lazy("home")
     success_message = "Artist '%(name)s' created successfully!"
@@ -142,6 +148,9 @@ class ArtistUpdateView(
         "twitter",
         "instagram",
         "youtube_link",
+        "location_name",  # add this
+        "latitude",  # add this
+        "longitude",
     ]
     success_url = reverse_lazy("home")
     context_object_name = "artist"
@@ -802,3 +811,33 @@ class MarkAllAsReadView(LoginRequiredMixin, View):
     def post(self, request):
         request.user.notifications.filter(is_read=False).update(is_read=True)
         return JsonResponse({"status": "success"})
+
+
+class ArtistMapView(TemplateView):
+    template_name = "app/map.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        artists_with_location = Artist.objects.filter(
+            latitude__isnull=False, longitude__isnull=False
+        )
+
+        # Build full data including picture URL
+        artist_data = []
+        for artist in artists_with_location:
+            artist_data.append(
+                {
+                    "id": artist.id,
+                    "name": artist.name,
+                    "latitude": artist.latitude,
+                    "longitude": artist.longitude,
+                    "location_name": artist.location_name,
+                    "genre": artist.genre,
+                    "picture": artist.picture.url if artist.picture else None,
+                }
+            )
+
+        context["artist_data_json"] = json.dumps(artist_data, cls=DjangoJSONEncoder)
+
+        return context

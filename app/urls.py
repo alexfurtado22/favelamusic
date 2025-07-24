@@ -8,6 +8,7 @@ from app.views import (
     ArtistDeleteView,
     ArtistDetailView,
     ArtistListView,
+    ArtistMapView,
     ArtistUpdateView,
     MarkAllAsReadView,
     NotificationListView,
@@ -102,4 +103,5 @@ urlpatterns = [
         AddArtistToPlaylistView.as_view(),
         name="add-artist-to-playlist",
     ),
+    path("map/", ArtistMapView.as_view(), name="artist-map"),
 ]
