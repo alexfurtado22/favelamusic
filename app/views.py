@@ -33,6 +33,7 @@ from django.views.generic import (
 
 from app.models import (
     Artist,
+    Badge,
     Follower,
     Notification,
     Playlist,
@@ -840,4 +841,19 @@ class ArtistMapView(TemplateView):
 
         context["artist_data_json"] = json.dumps(artist_data, cls=DjangoJSONEncoder)
 
+        return context
+
+
+class AllBadgesView(LoginRequiredMixin, ListView):
+    model = Badge
+    template_name = "app/all_badges.html"
+    context_object_name = "all_badges"
+    ordering = ["required_artist_count"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        earned_ids = set(
+            self.request.user.userbadge_set.values_list("badge_id", flat=True)
+        )
+        context["earned_badge_ids"] = earned_ids
         return context

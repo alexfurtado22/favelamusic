@@ -2,6 +2,7 @@ from django.urls import path
 
 from app.views import (
     AddArtistToPlaylistView,
+    AllBadgesView,
     # Artist and Rating
     ArtistCreateView,
     ArtistDashboardView,
@@ -104,4 +105,5 @@ urlpatterns = [
         name="add-artist-to-playlist",
     ),
     path("map/", ArtistMapView.as_view(), name="artist-map"),
+    path("badges/", AllBadgesView.as_view(), name="all_badges"),
 ]

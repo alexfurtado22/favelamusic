@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
 
-from .models import Follower, Notification
+from .models import Artist, Badge, Follower, Notification, UserBadge
 
 
 @receiver(post_save, sender=Follower)
@@ -44,3 +44,22 @@ def send_new_follower_notification(sender, instance, created, **kwargs):
                     else None,
                 },
             )
+
+
+@receiver(post_save, sender=Artist)
+def update_user_badges_on_artist_creation(sender, instance, created, **kwargs):
+    if not created:
+        return
+
+    user = instance.creator
+    artist_count = user.artists.count()
+
+    earned_badge_ids = UserBadge.objects.filter(user=user).values_list(
+        "badge_id", flat=True
+    )
+    available_badges = Badge.objects.exclude(id__in=earned_badge_ids)
+
+    for badge in available_badges:
+        if artist_count >= badge.required_artist_count:
+            UserBadge.objects.create(user=user, badge=badge)
+            print(f"🎉 Badge '{badge.name}' awarded to {user.username}")
